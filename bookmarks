@@ -1,0 +1,15 @@
+;;;; Emacs Bookmark Format Version 1 ;;;; -*- coding: utf-8-emacs -*- 
+;;; This format is meant to be slightly human-readable;
+;;; nevertheless, you probably don't want to edit it.
+;;; -*- End Of Bookmark File Format Version Stamp -*-
+(("org-capture-last-stored"
+ (filename . "~/Dropbox/cloudOrg/orgmode.org")
+ (front-context-string . "** NEXT weekly r")
+ (rear-context-string . "lates\n\n* Habits\n")
+ (position . 2214))
+("org-refile-last-stored"
+ (filename . "~/Dropbox/cloudOrg/francis_gtd.org")
+ (front-context-string . "** NEXT Weekly r")
+ (rear-context-string . ":TECH:\n* Habits\n")
+ (position . 1015))
+)
