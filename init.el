@@ -258,15 +258,16 @@ COMMAND, ARG, IGNORED are the arguments required by the variable
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; thanks to Rainer Konig
 ;; this snippet creates unique ID properties to the headlines of current file which do not have one
-(defun francis-org-add-ids-to-headlines-in-file ()
-  "Add ID properties to all headlines in the current file which
-do not already have one."
-  (interactive)
-  (org-map-entries 'org-id-get-create))
+;; temporarly commented out
+;; (defun francis-org-add-ids-to-headlines-in-file ()
+;;   "Add ID properties to all headlines in the current file which
+;; do not already have one."
+;;   (interactive)
+;;   (org-map-entries 'org-id-get-create))
  
-(add-hook 'org-mode-hook
-          (lambda ()
-            (add-hook 'before-save-hook 'francis-org-add-ids-to-headlines-in-file nil 'local)))
+;; (add-hook 'org-mode-hook
+;;           (lambda ()
+;;             (add-hook 'before-save-hook 'francis-org-add-ids-to-headlines-in-file nil 'local)))
 
 ;; this snippet copies to clipboard the ID; if headline has no ID property, it creates one
 (defun francis-copy-id-to-clipboard ()
