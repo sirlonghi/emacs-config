@@ -147,6 +147,7 @@ COMMAND, ARG, IGNORED are the arguments required by the variable
 (add-to-list 'load-path "/usr/local/Cellar/mu/1.0/share/emacs/site-lisp/mu/mu4e/")
 (require 'mu4e)
 
+(setq mu4e-mu-binary "/usr/local/bin/mu")
 (setq mu4e-maildir "~/Maildir")
 ; (setq mu4e-drafts-folder "/[Gmail].Drafts")
 (setq mu4e-sent-folder   "/[Gmail].Sent Mail")
@@ -255,6 +256,44 @@ COMMAND, ARG, IGNORED are the arguments required by the variable
 
 (setq make-backup-files nil) ; stop creating backup~ files
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; thanks to Rainer Konig
+;; this snippet creates unique ID properties to the headlines of current file which do not have one
+(defun francis-org-add-ids-to-headlines-in-file ()
+  "Add ID properties to all headlines in the current file which
+do not already have one."
+  (interactive)
+  (org-map-entries 'org-id-get-create))
+ 
+(add-hook 'org-mode-hook
+          (lambda ()
+            (add-hook 'before-save-hook 'francis-org-add-ids-to-headlines-in-file nil 'local)))
+
+;; this snippet copies to clipboard the ID; if headline has no ID property, it creates one
+(defun francis-copy-id-to-clipboard ()
+"Copy to ID link with the headline to killring, if no ID is there then create
+a new unique ID. This works only in org-mode or org-agenda buffers.
+The purpose of this function is to construct easily: -links to 
+org-mode items. If its assigned to a key it saves you marking the
+text and copying to the killring."
+       (interactive)
+       (when (eq major-mode 'org-agenda-mode); switch to orgmode
+	 (Org-agenda-show)
+	 (Org-agenda-goto))       
+       (when (eq major-mode 'org-mode); do this only in org-mode buffers
+	 (setq mytmphead (nth 4 (org-heading-components)))
+         (setq mytmpid (funcall 'org-id-get-create))
+	 (setq mytmplink (format "[[id:% s] [% s]]" mytmpid mytmphead))
+	 (kill-new mytmplink)
+	 (message "Copied% s to killring (clipboard)" mytmplink)))
+
+; (global-set-key (kbd ) 'francis-copy-id-to-clipboard)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; to jump back to previous position after following link
+;; (add-hook 'org-load-hook
+;;   (lambda ()
+;;     (define-key org-mode-map "\C-b" 'org-mark-ring-goto)))
+    
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
