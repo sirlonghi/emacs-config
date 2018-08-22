@@ -208,8 +208,8 @@ COMMAND, ARG, IGNORED are the arguments required by the variable
                     TeX-run-command t t :help "Run xelatex") t))
 
 ;; koma-letter
-(add-to-list 'auto-mode-alist '("\\.lco" . tex-mode))
-(eval-after-load 'ox '(require 'ox-koma-letter))
+;; (add-to-list 'auto-mode-alist '("\\.lco" . tex-mode))
+;; (eval-after-load 'ox '(require 'ox-koma-letter))
 
 (eval-after-load 'ox-latex
   '(add-to-list 'org-latex-packages-alist '("AUTO" "babel" t) t))
@@ -295,6 +295,9 @@ text and copying to the killring."
 ;;   (lambda ()
 ;;     (define-key org-mode-map "\C-b" 'org-mark-ring-goto)))
     
+;; taskjuggler
+(require 'ox-taskjuggler)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -302,7 +305,8 @@ text and copying to the killring."
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (org-edna yasnippet zenburn-theme use-package helm company))))
+    (org-edna yasnippet zenburn-theme use-package helm company)))
+ '(safe-local-variable-values (quote ((Tex-engine . xetex)))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
