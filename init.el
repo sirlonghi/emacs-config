@@ -106,7 +106,8 @@ COMMAND, ARG, IGNORED are the arguments required by the variable
 (add-to-list 'load-path "~/.emacs.d/custom/")
 
 ;; Set which files must be visible on agenda
-(setq org-agenda-files (list "~/Dropbox/cloudOrg/orgmode.org"
+(setq org-agenda-files (list "~/Dropbox/cloudOrg/Work.org"
+			     "~/Dropbox/cloudOrg/orgmode.org"
 			     "~/Dropbox/cloudOrg/francis_gtd.org"))
 
 ;; config necessary to org-mode
@@ -153,9 +154,10 @@ COMMAND, ARG, IGNORED are the arguments required by the variable
 (add-to-list 'load-path "/usr/local/Cellar/mu/1.0/share/emacs/site-lisp/mu/mu4e/")
 (require 'mu4e)
 
-(setq mu4e-maildir "~/Maildir")
-; (setq mu4e-drafts-folder "/[Gmail].Drafts")
-(setq mu4e-sent-folder   "/[Gmail].Sent Mail")
+(setq mu4e-mu-binary "/usr/local/bin/mu")
+(setq mu4e-maildir "~/Mail")
+(setq mu4e-drafts-folder "/Gmail/Drafts")
+(setq mu4e-sent-folder   "/Gmail/Sent Mail")
 ;; don't save message to Sent Messages, Gmail/IMAP takes care of this
 (setq mu4e-sent-messages-behavior 'delete)
 ;; allow for updating mail using 'U' in the main view:
@@ -163,8 +165,9 @@ COMMAND, ARG, IGNORED are the arguments required by the variable
 
 ;; shortcuts
 (setq mu4e-maildir-shortcuts
-    '( ("/INBOX"               . ?i)
-       ("/[Gmail].Sent Mail"   . ?s)))
+    '(("/Gmail/INBOX"       . ?i)
+      ("/Gmail/Sent Mail"   . ?s)
+      ("/libero/INBOX"      . ?l)))
 
 ;; something about ourselves
 (setq
@@ -172,8 +175,10 @@ COMMAND, ARG, IGNORED are the arguments required by the variable
    user-full-name  "Francesco Longhi"
    mu4e-compose-signature
     (concat
-      "Saluti,\n"
-      "Francesco Longhi\n"))
+     "Francesco Longhi\n"
+     "via Canturina 312\n"
+     "22100 Como\n"))
+
 
 ;; show images
 (setq mu4e-show-images t)
@@ -190,6 +195,22 @@ COMMAND, ARG, IGNORED are the arguments required by the variable
 ;;   - w3m -dump -cols 80 -T text/html
 ;;   - view in browser (provided below)
 (setq mu4e-html2text-command "textutil -stdin -format html -convert txt -stdout")
+
+;; sending mail -- replace USERNAME with your gmail username
+;; also, make sure the gnutls command line utils are installed
+
+(require 'smtpmail)
+
+(setq message-send-mail-function 'smtpmail-send-it
+      starttls-use-gnutls t
+      smtpmail-starttls-credentials
+      '(("smtp.gmail.com" 587 nil nil))
+      smtpmail-auth-credentials
+      (expand-file-name "~/.authinfo.gpg")
+      smtpmail-default-smtp-server "smtp.gmail.com"
+      smtpmail-smtp-server "smtp.gmail.com"
+      smtpmail-smtp-service 587
+      smtpmail-debug-info t)
 
 ;; spell check
 (add-hook 'mu4e-compose-mode-hook
@@ -213,8 +234,8 @@ COMMAND, ARG, IGNORED are the arguments required by the variable
                     TeX-run-command t t :help "Run xelatex") t))
 
 ;; koma-letter
-(add-to-list 'auto-mode-alist '("\\.lco" . tex-mode))
-(eval-after-load 'ox '(require 'ox-koma-letter))
+;; (add-to-list 'auto-mode-alist '("\\.lco" . tex-mode))
+;; (eval-after-load 'ox '(require 'ox-koma-letter))
 
 (eval-after-load 'ox-latex
   '(add-to-list 'org-latex-packages-alist '("AUTO" "babel" t) t))
@@ -226,7 +247,12 @@ COMMAND, ARG, IGNORED are the arguments required by the variable
      (lisp . t)
      (python . t)
      (R . t)
+<<<<<<< HEAD
      (sh . t)))
+=======
+     (shell . t)
+     (ledger . t)))
+>>>>>>> 046e8a4e84dd3f7326fd06b2300696594821a005
 
 ;; logging into drawers
 (setq org-log-done (quote time))
@@ -261,6 +287,54 @@ COMMAND, ARG, IGNORED are the arguments required by the variable
 
 (setq make-backup-files nil) ; stop creating backup~ files
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; thanks to Rainer Konig
+;; this snippet creates unique ID properties to the headlines of current file which do not have one
+;; temporarly commented out
+;; (defun francis-org-add-ids-to-headlines-in-file ()
+;;   "Add ID properties to all headlines in the current file which
+;; do not already have one."
+;;   (interactive)
+;;   (org-map-entries 'org-id-get-create))
+ 
+;; (add-hook 'org-mode-hook
+;;           (lambda ()
+;;             (add-hook 'before-save-hook 'francis-org-add-ids-to-headlines-in-file nil 'local)))
+
+;; this snippet copies to clipboard the ID; if headline has no ID property, it creates one
+(defun francis-copy-id-to-clipboard ()
+"Copy to ID link with the headline to killring, if no ID is there then create
+a new unique ID. This works only in org-mode or org-agenda buffers.
+The purpose of this function is to construct easily: -links to 
+org-mode items. If its assigned to a key it saves you marking the
+text and copying to the killring."
+       (interactive)
+       (when (eq major-mode 'org-agenda-mode); switch to orgmode
+	 (Org-agenda-show)
+	 (Org-agenda-goto))       
+       (when (eq major-mode 'org-mode); do this only in org-mode buffers
+	 (setq mytmphead (nth 4 (org-heading-components)))
+         (setq mytmpid (funcall 'org-id-get-create))
+	 (setq mytmplink (format "[[id:% s] [% s]]" mytmpid mytmphead))
+	 (kill-new mytmplink)
+	 (message "Copied% s to killring (clipboard)" mytmplink)))
+
+; (global-set-key (kbd ) 'francis-copy-id-to-clipboard)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; to jump back to previous position after following link
+;; (add-hook 'org-load-hook
+;;   (lambda ()
+;;     (define-key org-mode-map "\C-b" 'org-mark-ring-goto)))
+    
+;; taskjuggler
+(require 'ox-taskjuggler)
+
+;; set property inheritance (which is not set by default)
+(setq org-use-property-inheritance t)
+
+;; ledger
+(require 'ledger-mode)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -268,7 +342,12 @@ COMMAND, ARG, IGNORED are the arguments required by the variable
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
+<<<<<<< HEAD
     (auctex org-edna yasnippet zenburn-theme use-package helm company))))
+=======
+    (ledger-mode org-edna yasnippet zenburn-theme use-package helm company)))
+ '(safe-local-variable-values (quote ((Tex-engine . xetex)))))
+>>>>>>> 046e8a4e84dd3f7326fd06b2300696594821a005
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
