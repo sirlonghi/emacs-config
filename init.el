@@ -129,6 +129,12 @@ COMMAND, ARG, IGNORED are the arguments required by the variable
 ;; beancount
 (require 'beancount)
 
+;; ledger
+(autoload 'ledger-mode "ledger-mode" "A major mode for Ledger" t)
+(add-to-list 'load-path
+             (expand-file-name "/usr/local/share/emacs/site-lisp/ledger"))
+(add-to-list 'auto-mode-alist '("\\.ledger$" . ledger-mode))
+
 ;; gnupg
 ;; (require 'epa-file)
 ;; (setq epg-gpg-program "/usr/local/Cellar/gnupg@2.1")
@@ -220,7 +226,7 @@ COMMAND, ARG, IGNORED are the arguments required by the variable
      (lisp . t)
      (python . t)
      (R . t)
-     (shell . t)))
+     (sh . t)))
 
 ;; logging into drawers
 (setq org-log-done (quote time))
@@ -262,7 +268,7 @@ COMMAND, ARG, IGNORED are the arguments required by the variable
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (org-edna yasnippet zenburn-theme use-package helm company))))
+    (auctex org-edna yasnippet zenburn-theme use-package helm company))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
