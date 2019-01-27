@@ -72,6 +72,11 @@ COMMAND, ARG, IGNORED are the arguments required by the variable
 (setq mac-command-modifier 'meta)
 (setq mac-option-modifier nil)
 
+;; org-clock
+;; Save clock data and state changes and notes in the LOGBOOK drawer
+(setq org-clock-into-drawer "CLOCKING")
+(setq org-log-into-drawer "LOGBOOK")
+
 ;; Capture templates for: TODO tasks, Notes, appointments, phone calls, meetings, and org-protocol
 ;; %a          annotation, normally the link created with org-store-link
 ;; %i          initial content, the region when capture is called with C-u.
@@ -137,9 +142,9 @@ COMMAND, ARG, IGNORED are the arguments required by the variable
 (add-to-list 'auto-mode-alist '("\\.ledger$" . ledger-mode))
 
 ;; gnupg
-;; (require 'epa-file)
-;; (setq epg-gpg-program "/usr/local/Cellar/gnupg@2.1")
-;; (epa-file-enable)
+(require 'epa-file)
+(custom-set-variables '(epg-gpg-program "/usr/local/Cellar/gnupg21"))
+;(epa-file-enable)
 
 ;; evil-mode
 (add-to-list 'load-path "~/.emacs.d/evil")
@@ -194,7 +199,7 @@ COMMAND, ARG, IGNORED are the arguments required by the variable
 ;;   - html2markdown | grep -v '&nbsp_place_holder;' (Requires html2text pypi)
 ;;   - w3m -dump -cols 80 -T text/html
 ;;   - view in browser (provided below)
-(setq mu4e-html2text-command "textutil -stdin -format html -convert txt -stdout")
+;; (setq mu4e-html2text-command "textutil -stdin -format html -convert txt -stdout")
 
 ;; sending mail -- replace USERNAME with your gmail username
 ;; also, make sure the gnutls command line utils are installed
@@ -244,15 +249,23 @@ COMMAND, ARG, IGNORED are the arguments required by the variable
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((emacs-lisp . t)
+     (calc . t)
      (lisp . t)
      (python . t)
      (R . t)
-<<<<<<< HEAD
-     (sh . t)))
-=======
      (shell . t)
      (ledger . t)))
->>>>>>> 046e8a4e84dd3f7326fd06b2300696594821a005
+
+;; ask for evaluation confirm only for certain languages
+;;(defun my-org-confirm-babel-evaluate (lang body)
+;;  (not (member lang '("shell" "lisp"))))
+
+;;(setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
+(setq org-confirm-babel-evaluate nil) 
+      
+;; odt exporter via MathML
+(setq org-latex-to-mathml-convert-command
+      "latexmlmath \"%i\" --presentationmathml=%o")
 
 ;; logging into drawers
 (setq org-log-done (quote time))
@@ -342,12 +355,8 @@ text and copying to the killring."
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-<<<<<<< HEAD
-    (auctex org-edna yasnippet zenburn-theme use-package helm company))))
-=======
-    (ledger-mode org-edna yasnippet zenburn-theme use-package helm company)))
+    (ledger-mode auctex org-edna yasnippet zenburn-theme use-package helm company)))
  '(safe-local-variable-values (quote ((Tex-engine . xetex)))))
->>>>>>> 046e8a4e84dd3f7326fd06b2300696594821a005
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
