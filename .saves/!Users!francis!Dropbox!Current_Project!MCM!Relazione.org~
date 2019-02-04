@@ -1,0 +1,128 @@
+#+OPTIONS: tex:t
+#+OPTIONS: tex:imagemagick
+
+* Memorandum  
+** Introduzione
+   L'intervento previsto riguarda la messa in sicurezza del capannone esistente; ad esso dovrebbe seguire una seconda fase di calcolo più accurato del comportamento globale dell'intero edificio mediante analisi di modello ad elementi finiti per realizzare il vero adeguamento antisismico.
+   In questa sede si cercherà di esaminare e correggere solamente comportamenti "locali" relativi soprattutto a:
+- perdita di appoggio di trave su pilastro;
+- perdita di appoggio di tegolo di copertura su trave;
+- ribaltamento di pannello di tamponamento fuori piano;
+- controventamento e fissaggio di eventuali scaffalature o attrezzature.
+Non verranno presi in esame eventuali criticità dei plinti a bicchiere (verifica dell'effettivo grado di incastro) o del terreno di fondazione (non ci sono dati a disposizione). Per queste ultime problematiche si ricorda la possibilità di rinforzare il piede del pilastro con incamiciatura della pavimentazione industriale (salvo verificare il pilastro alle nuove sollecitazioni, ovvero all'aumento del momento flettente) e la possibilità di effettuare iniezioni cementizie di consolidamento del terreno.
+Un altro aspetto che andrebbe indagato riguarda l'efficacia dei giunti tra le strutture, che dovrebbero essere realizzati per evitare il fenomeno di martellamento.
+
+** Principi generali
+   Alla luce delle problematiche sopra esposte i criteri di progettazione degli interventi sono improntati a correggere le criticità alterando il meno possibile lo schema statico della struttura esistente a meno di intervenire pesantemente con adeguamento statico della stessa alla luce della nuova normativa sismica: ciò si traduce ad esempio nell'evitare di collegare travi e pilastri o tegoli di copertura e travi in modo da introdurre significativi momenti flettenti che gli elementi strutturali non sono stati progettati oer sopportare. Di seguito vengono elencati alcuni criteri di progettazione:
+- i semplici appoggi ad attrito devono essere trasformati in cerniere;
+- deve essere contrastata la rotazione torsionale delle travi di bordo;
+- deve essere impedito il collasso fuori piano dei pannelli di tamponamento con adeguati ritegni che permettano però il libero scorrimento nel piano del pannello, altrimenti il pannello diventa elemento irrigidente per il telaio costituito da trave e pilastri, contribuendo all'aumento dei carichi assorbiti durante il sisma.
+- le scaffalature o attrezzature suscettibili di ribaltamento devono essere opportunamente controventate e fissate, ma non alla struttura dell'edificio dalla quale anzi dovrebbero mantenere un franco per evitare fenomeni di martellamento; un'altra precauzione consiste nell'abbassarne il baricentro, spostando in basso i carichi più pesanti.
+- cenni sulla gerarchia delle resistenze, duttilità degli elementi e meccanismi dissipativi
+
+** Criteri di progettazione
+   Il pre-dimensionamento degli interventi di miglioramento sismico può quindi essere eseguito considerando l’edificio come un oscillatore semplice caratterizzato da una rigidezza pari alla somma della rigidezza di tutti i pilastri, e da una massa pari a quella della struttura di copertura (somma del peso delle travi, degli elementi di copertura, degli impianti, delle impermeabilizzazioni ed ogni altro carico portato, divisa per l’accelerazione di gravità g) più il 50% della massa (peso diviso g) dei pilastri e dei pannelli di tamponatura, sia per pannelli orizzontali sia per pannelli verticali.
+Con tali ipotesi, il periodo proprio della struttura può essere stimato come illustrato nella tabella seguente, nella quale si è ipotizzato che per la rigidezza del pilastro si adotti il valore ottenuto con riferimento all'inerzia della sezione di solo calcestruzzo.
+Noto il periodo proprio della struttura, il taglio totale alla base può essere determinato come:
+
+F_tot = W_tot \cdot S_a(T_1)/g
+
+dove S_a(T_1) è la pseudo-accelerazione spettrale derivata dallo spettro di risposta di progetto per il sito in esame, calcolata in corrispondenza del primo periodo proprio T_1. Per la determinazione dello spettro di risposta di progetto, si suggerisce di fare riferimento ad un valore opportunamente modesto del fattore di struttura q (esempio q=1,5), non potendo fare affidamento su un comportamento particolarmente duttile degli elementi strutturali.
+Il taglio alla base di ciascun pilastro può quindi essere determinato a partire dal taglio totale alla base ripartendolo su ciascun pilastro proporzionalmente alla sua rigidezza (A), nel caso che l’impalcato possa essere ipotizzato infinitamente rigido, oppure proporzionalmente alla sua area di influenza, e quindi proporzionalmente al peso sopportato, nel caso che l’impalcato non sia ipotizzabile come infinitamente rigido (B).
+
+A – Impalcato infinitamente rigido: 
+
+\[
+F_i = F_{tot} \cdot \frac{K_i}{\sum K_i}
+\]
+
+B – Impalcato infinitamente deformabile: 
+
+\[
+F_i = F_{tot} \cdot \frac{W_i}{\sum W_i}
+\]
+
+Infine, lo spostamento in sommità di ciascun pilastro dovuto al terremoto può essere stimato come:
+
+\[
+S_{di} = q \cdot F_i/K_i
+\]
+
+dove q è il coefficiente di struttura utilizzato per la definizione dello spettro di progetto.
+Per quanto riguarda il dimensionamento dei singoli collegamenti, in accordo ad una valutazione approssimata ed in taluni casi non cautelativa, le azioni da utilizzare sono pari alle forze di inerzia (F_i) relative a ciascun elemento da collegare. Quindi, esse sono pari al prodotto tra la massa del singolo elemento da collegare e degli eventuali elementi portati (W_i/g), moltiplicato per la pseudo-accelerazione spettrale S_a(T_1):
+
+F_i=W_i \cdot S_a(T)/g
+
+Per una valutazione più cautelativa è generalmente opportuno tener conto del comportamento complessivo della struttura. In particolare:
+1) nel caso di impalcato infinitamente rigido, il collegamento trave-pilastro va calcolato considerando il taglio alla base dello stesso pilastro;
+2) nel caso di collegamento o interazione tra gli elementi di copertura, il collegamento tra questi e la trave va valutato considerando la ripartizione effettiva della sollecitazione nell’impalcato: il calcolo di tale collegamento deve tener conto dell’incremento di forza trasmessa alla trave dagli elementi di copertura più vicini ai telai.
+
+** Analisi carichi 
+   :PROPERTIES:
+   :header-args: :exports both
+   :END:
+*** Trave di bordo
+Stima peso proprio PTB (kg/m)
+#+NAME: PTB
+#+BEGIN_SRC calc
+2500*((0.50*0.75)-(0.20*0.50))
+#+END_SRC
+
+#+RESULTS: PTB
+: 687.5
+
+*** Trave centrale
+Stima peso proprio PTC (kg/m)
+#+NAME: PTC
+#+BEGIN_SRC calc
+2500*((0.90*0.75)-(0.40*0.50))
+#+END_SRC
+
+#+RESULTS: PTC
+: 1187.5
+
+*** Tegolo di copertura 
+- Stima peso proprio PTG (kg/m^2)
+#+NAME: PTG
+#+BEGIN_SRC calc 
+2500*((2.40*0.50)-(2.20*0.30))/2.40
+#+END_SRC
+
+#+RESULTS: PTG
+: 562.5
+
+- Carico di neve CN (kg/m^2)
+#+NAME: CN
+#+BEGIN_SRC calc 
+140
+#+END_SRC
+
+#+RESULTS: CN
+: 140
+
+- Carico trasmesso da tegolo su trave CTG
+#+NAME: CTG
+#+BEGIN_SRC calc :var CN=CN :var PTG=PTG  
+((1.3*PTG + 1.5*CN) * 12.50/2) * 2.40
+#+END_SRC
+
+#+RESULTS: CTG
+: 14118.75
+
+- Carico trasmesso da trave di bordo su pilastro CTB
+#+NAME: CTB
+#+BEGIN_SRC calc :var CN=CN :var PTG=PTG :var PTB=PTB :var LY=8
+((1.3*PTG + 1.5*CN) * (12.50/2) * (LY/2)) + (1.3*PTB * LY/2)
+#+END_SRC
+
+#+RESULTS: CTB
+: 27106.25
+
+- Carico trasmesso da trave centrale su pilastro CTC
+#+NAME: CTC
+#+BEGIN_SRC calc :var CN=CN :var PTG=PTG :var PTC=PTC :var LY=8
+((1.3*PTG + 1.5*CN) * (12.50) * (LY/2)) + (1.3*PTC * LY/2)
+#+END_SRC
+
+#+RESULTS: CTC
+: 53237.5
