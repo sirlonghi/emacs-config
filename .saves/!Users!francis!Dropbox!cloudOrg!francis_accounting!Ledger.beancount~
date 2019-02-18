@@ -1,0 +1,4260 @@
+-*- mode: org; mode: beancount; coding: utf-8; fill-column: 400; epa-file-encrypt-to: nil -*-
+
+* About this file
+;; Documento per la gestione delle finanze personali
+;; Sfrutta org mode per la strutturazione del file
+;; (da sperimentare) archiviazione per anno con ripristino del bilancio iniziale
+;; (da sperimentare) gestione su più files tramite include
+
+;; beancount minor-mode keys
+;; C-c ' - bring selection to choose an account
+;; C-c/C-g - change flag ! to * and viceversa
+;; C-c r - refresh account list (for using C-c ')
+;; C-c | - runs bean-check
+;; C-c q - runs bean-query
+;; C-c x - shows related transactions, as bean-doctor context
+;; C-c k - same as before???
+;; C-c ; - aligns to previous number
+;; C-c : - aligns all numbers (doesn't works???)
+
+;; standard transaction
+;;    date */! [payee] [description]
+;;    account amount
+;;    account [amount]
+
+;; other useful functions
+
+;; transaction can be tagged to subset them with #tag (after description)
+;; for multiple tagged transactions use:
+;;    pushtag #tag
+;;    transaction 1
+;;    ...
+;;    transaction n
+;;    poptag #tag
+
+;; similar to tags links (^link) can group related transactions such as pending invoices and related payments
+
+;; some examples of transactions (apart from the obvious ones)
+
+;; date * "Ballerini" "Rental invoice" ^invoice-ballerini-mar16
+;; Income:Rent:Ballerini  -1500.00 EUR
+;; Assets:IT:AccReceivable
+
+;; date * "check deposit from Ballerini" ^invoice-ballerini-mar16
+;; Assets:IT:BPS:Checking  1500.00 EUR
+;; Assets:IT:AccReceivable
+
+;; date * "cash from Carnelli"
+;; Assets:IT:Cash  580.00 EUR
+;; Income:Rent:Carnelli
+
+;; Reports
+;;    Transactions pertaining to a certain account
+;; bean-report file.beancount.gpg journal -a accountName
+
+option "title" "Personal Ledger"
+option "operating_currency" "EUR"
+
+;; Setting directory for statements attachments
+option "documents" "./Bank_Statements"
+
+* Chart of Accounts
+; plugin "beancount.plugins.auto_accounts" ;accounts created on the fly
+** Assets
+1966-06-13 open Assets:IT:BPS:Checking
+1966-06-13 open Assets:IT:Cash
+1966-06-13 open Assets:CH:Cash
+1966-06-13 open Assets:CH:BPSSuisse:Checking ;negative amount, is a debit account
+1966-06-13 open Assets:IT:AccReceivable
+2014-01-01 open Assets:Trading:Azimut
+2014-01-01 open Assets:IT:Cracantu:Checking
+** Equity
+2014-01-01 open Equity:Opening-Balances
+** Liabilities
+1966-06-13 open Liabilities:IT:Visa
+1966-06-13 open Liabilities:IT:PostePay
+2012-01-01 open Liabilities:IT:Mortgage ;mutuo, modify date
+1966-06-13 open Liabilities:IT:AccPayable
+1966-06-13 open Liabilities:IT:RentDeposit
+** Income
+1966-06-13 open Income:Family:Reimbursement
+1966-06-13 open Income:Parents:Reimbursement
+1966-06-13 open Income:Parents:Donation
+1966-06-13 open Income:Albatre:Reimbursement
+1966-06-13 open Income:LonghiCostruzioni:Reimbursement
+2018-11-01 open Income:CH:Shopping:Reimbursement
+2018-11-01 open Income:IT:Shopping:Reimbursement
+1966-06-13 open Income:Lessons
+1966-06-13 open Income:Work
+1966-06-13 open Income:Work:Reimbursement
+1966-06-13 open Income:Bank:Interest
+1966-06-13 open Income:CapitalGain
+2018-06-01 open Income:Funds:Reimbursement
+1966-06-13 open Income:Rent:Deposit
+1966-06-13 open Income:Rent:Battaglino
+1966-06-13 open Income:Rent:PrimeEquipe
+1966-06-13 open Income:Rent:Balzan
+1966-06-13 open Income:Rent:Falaha
+1966-06-13 open Income:Rent:Maba
+1966-06-13 open Income:Rent:Valdez
+2008-09-01 open Income:Rent:Ballerini
+2008-09-01 open Income:Rent:Pedroncelli
+2006-09-01 open Income:Rent:LaDolceAlbate
+2012-04-02 open Income:Rent:Stylesilk
+2016-04-02 open Income:Rent:Carnelli
+2016-04-02 open Income:Rent:Ciceri
+2016-04-02 open Income:Rent:IlBoschetto
+2016-04-02 open Income:Rent:Bajrami
+2016-04-02 open Income:Rent:Milli
+2016-04-02 open Income:Rent:Rigamonti
+2016-04-02 open Income:Rent:Robbiani
+2016-04-02 open Income:Rent:Tarabbia
+2018-12-01 open Income:Rent:Castiglioni
+2019-01-01 open Income:Rent:Libori
+2016-04-02 open Income:Rent:Mezzanzanica
+2018-01-01 open Income:Rent:Canturina:Water
+2018-01-01 open Income:Rent:Canturina:Electricity
+2018-01-01 open Income:Rent:Canturina:Expenses
+2018-01-01 open Income:Rent:Colli:Water
+2018-01-01 open Income:Rent:Taxes:Reimbursement
+2018-01-01 open Income:Rent:Albatre:Water
+2018-01-01 open Income:Rent:Albatre:Electricity
+2018-01-01 open Income:Rent:Albatre:Expenses
+2015-05-01 open Income:CH:Moka-HotCoffee CHF
+2016-04-02 open Income:CH:Rent:Portesan CHF
+2014-04-17 open Income:CH:Mancava-ACG CHF
+1966-06-13 open Income:Unknown
+2014-01-01 open Income:Trading:PnL
+
+** Expenses
+*** Food and restaurant
+1966-06-13 open Expenses:Food:Groceries
+1966-06-13 open Expenses:Food:Restaurant
+*** Family
+1966-06-13 open Expenses:Family:Vacation
+1966-06-13 open Expenses:Family:Paola
+1966-06-13 open Expenses:Family:Children
+1966-06-13 open Expenses:Family:Pets
+1966-06-13 open Expenses:Family:Health
+*** Personal
+1966-06-13 open Expenses:Personal:Daycash
+1966-06-13 open Expenses:Personal:Leisure
+1966-06-13 open Expenses:Personal:Health
+1966-06-13 open Expenses:Personal:Gifts
+1966-06-13 open Expenses:Personal:Association
+*** Transportation
+1966-06-13 open Expenses:Transport:Gasoline
+1966-06-13 open Expenses:Transport:InsuranceAndFees
+1966-06-13 open Expenses:Transport:Maintenance
+1966-06-13 open Expenses:Transport:Toll
+*** Home
+1966-06-13 open Expenses:Home:Gas
+1966-06-13 open Expenses:Home:Maintenance
+1966-06-13 open Expenses:Home:Water
+1966-06-13 open Expenses:Home:Electricity
+1966-06-13 open Expenses:Home:Phonternet
+1966-06-13 open Expenses:Home:Garbage
+*** BPS Bank
+1966-06-13 open Expenses:IT:Bank:Taxes
+1966-06-13 open Expenses:IT:Bank:Fees
+1966-06-13 open Expenses:IT:Bank:Interest
+2013-04-11 open Expenses:IT:Bank:Insurance
+2013-04-11 open Expenses:IT:Bank:Fidejussione
+*** BPS Suisse Bank
+1966-06-13 open Expenses:CH:Bank:Taxes
+1966-06-13 open Expenses:CH:Bank:Fees
+1966-06-13 open Expenses:CH:Bank:Interest
+*** Taxes
+1966-06-13 open Expenses:IT:Taxes:Others
+1966-06-13 open Expenses:IT:Taxes:Property
+1966-06-13 open Expenses:IT:Taxes:Unico
+1966-06-13 open Expenses:IT:Taxes:Bollo
+1966-06-13 open Expenses:IT:Taxes:Consultant
+*** Albatre
+1966-06-13 open Expenses:Albatre:Electricity
+1966-06-13 open Expenses:Albatre:Water
+1966-06-13 open Expenses:Albatre:Maintenance
+*** Canturina
+1966-06-13 open Expenses:Canturina:Electricity
+1966-06-13 open Expenses:Canturina:Water
+1966-06-13 open Expenses:Canturina:Maintenance
+1966-06-13 open Expenses:Colli:Water
+*** Various
+1966-06-13 open Expenses:Unknown
+1966-06-13 open Expenses:Parents:Maintenance
+1966-06-13 open Expenses:Charity
+1966-06-13 open Expenses:Postal
+1966-06-13 open Expenses:Parents
+1966-06-13 open Expenses:LonghiCostruzioni
+1966-06-13 open Expenses:Legal:Consultant
+*** Work
+1966-06-13 open Expenses:Work:Office
+1966-06-13 open Expenses:Work:Courses
+1966-06-13 open Expenses:Work:Fees
+1966-06-13 open Expenses:Work:Insurance
+1966-06-13 open Expenses:Work:Retirement
+1966-06-13 open Expenses:Work:Consultant
+*** Splügen
+1966-06-13 open Expenses:CH:C4:Taxes CHF
+1966-06-13 open Expenses:CH:C4:Property CHF
+1966-06-13 open Expenses:CH:C4:Utilities CHF
+*** Property
+1966-06-13 open Expenses:Property:Maintenance
+1966-06-13 open Expenses:Property:Consultant
+1966-06-13 open Expenses:Property:Insurance
+1966-06-13 open Expenses:Property:Water
+1966-06-13 open Expenses:Property:Electricity
+1966-06-13 open Expenses:Property:Maia
+1966-06-13 open Expenses:Property:Fees
+*** Trading
+2014-01-01 open Expenses:Trading:Taxes
+2014-01-01 open Expenses:Azimut:Commissions
+
+*** Visa
+1966-06-13 open Expenses:CreditCard:Visa
+* Initialize assets
+** BPS
+2015-01-01 pad Assets:IT:BPS:Checking Equity:Opening-Balances
+2018-01-08 balance Assets:IT:BPS:Checking  14248.61 EUR
+** Cash
+2015-01-01 pad Assets:IT:Cash Equity:Opening-Balances
+2018-01-08 balance Assets:IT:Cash  22780.00 EUR
+** SwissCash
+2015-01-05 pad Assets:CH:Cash Equity:Opening-Balances
+2018-01-08 balance Assets:CH:Cash  6955.00 CHF
+** BPSSuisse
+2018-03-16 balance Assets:CH:BPSSuisse:Checking  -35482.25 EUR
+2015-01-01 pad Assets:CH:BPSSuisse:Checking Equity:Opening-Balances
+
+;; * Rent Liabilities
+;; 2017-05-15 * "Balzan cauzione"
+;;   Assets:IT:Cash  1500.00 EUR
+;;   Liabilities:IT:RentDeposit:Balzan
+
+;; * 2017
+;; 2017-12-31 * "COMPETENZE - INTERESSI CREDITORI | Liquidazione al 31/12/2017 c/c 066/0011383"
+;;   Assets:IT:BPS:Checking  +10.72 EUR
+;;   Income:Bank:Interest
+
+;; 2017-12-31 * "COMPETENZE - ONERI, COMMISSIONI E SPESE | Liquidazione al 31/12/2017 c/c 066/0011383"
+;;   Assets:IT:BPS:Checking  -18.00 EUR
+;;   Expenses:IT:Bank:Fees
+
+;; 2017-12-31 * "RECUPERO IMPOSTA DI BOLLO | Periodo dal 01/10/2017 al 31/12/2017 Conto Corrente n. 066/0011383"
+;;   Assets:IT:BPS:Checking  -8.55 EUR
+;;   Expenses:IT:Bank:Taxes
+
+;; 2017-12-31 * "riepilogo Visa"
+;;   Expenses:Personal:Leisure  335.27 EUR
+;;   Liabilities:IT:Visa
+
+* 2018
+** Bank transactions
+*** January
+2018-01-02 * "COMMISSIONI | Disposizione bonifico SCT Rif. VTP18002T0000998481090210900IT"
+  Assets:IT:BPS:Checking  -1.50 EUR
+  Expenses:IT:Bank:Fees
+
+2018-01-02 * "VOSTRA DISPOSIZIONE | Disposizione bonifico SCT Fv. GENERALI ITALIA SPA - MAURO PETRELLI S.R.POLIZZA 350362323 Rif. VTP18002T0000998481090210900IT"
+  Assets:IT:BPS:Checking  -1048.00 EUR
+  Expenses:Property:Insurance
+
+2018-01-02 * "COSTO CARTA | Bancomat - Anno 2018 Carta N.: 693416Id. 180102080616078802"
+  Assets:IT:BPS:Checking  -18.00 EUR
+  Expenses:IT:Bank:Fees
+
+2018-01-05 * "RICARICA TELEFONICA | Pagamento Ricarica Telefonica Scrigno Operazione del 05/01/2018 alle 12:02 Ricarica WIND"
+  Assets:IT:BPS:Checking  -30.00 EUR
+  Expenses:Home:Phonternet
+
+2018-01-10 * "ORDINE E CONTO | ORD. MABA S.R.L. SALDO AFFITTO GENNAIO Rif. 0843000897885401485129001600IT"
+  Assets:IT:BPS:Checking  +500.21 EUR
+  Income:Rent:Taxes:Reimbursement  -2.00 EUR
+  Income:Rent:Canturina:Water  -14.16 EUR
+  Income:Rent:Canturina:Expenses  -30.00 EUR
+  Income:Rent:Maba
+
+2018-01-10 * "PAGAMENTO BOLLO AUTO | Pagamento Bollo Auto Targa CO203625 scadenza 12/2018"
+  Assets:IT:BPS:Checking  -100.80 EUR
+  Expenses:Transport:InsuranceAndFees
+
+2017-12-31 * "RECUPERO IMPOSTA DI BOLLO | Imposta sostitutiva di bollo su deposito titoli 066/498411"
+  Assets:IT:BPS:Checking  -4.50 EUR
+  Expenses:IT:Bank:Taxes
+
+2018-01-15 * "ADDEBITO NEXI | POSIZIONE N. 0116300"
+  Assets:IT:BPS:Checking  -335.27 EUR
+  Liabilities:IT:Visa
+
+2018-01-15 * "ADDEBITI PREAUTORIZZATI SDD-FIDATY ORO | SDD 0521149895 FIDATI S.p.A. ID MANDATO:I650840000002335697A01 ADDEB.FIDATY ORO 7459763-2017-12 SDD 60170090TIPO:CORE-RCUR"
+  Assets:IT:BPS:Checking  -488.60 EUR
+  Expenses:Food:Groceries
+
+2018-01-15 * "ORDINE E CONTO | ORD. BALZAN CLEITON Fv. Francesco Longhi affitto + condominio. Rif. EA18011221969554481090010900IT"
+  Assets:IT:BPS:Checking  +558.82 EUR
+  Income:Rent:Balzan  -500.00 EUR
+  Income:Rent:Canturina:Expenses  -15.00 EUR
+  Income:Rent:Canturina:Water
+
+2018-01-16 * "ORDINE E CONTO | ORD. GELATERIA ARTIGIANA DI FALAHA TAREK AFFITTO DICEMBRE 2017 NOT-PROVIDED Rif. EA18011523072856481090010900IT"
+  Assets:IT:BPS:Checking  +782.00 EUR
+  Income:Rent:Falaha  -750.00 EUR
+  Income:Rent:Canturina:Expenses
+  Income:Rent:Taxes:Reimbursement  -2.00 EUR
+
+2018-01-16 * "VOSTRA DISPOSIZIONE | PAGAMENTO PREMIO ASSICURATIVO PRODOTTO: 888 - INVESTIDOC FREE 2% PIANO RISPPOLIZZA: 00000000721532"
+  Assets:IT:BPS:Checking  -100.00 EUR
+  Expenses:IT:Bank:Insurance
+
+2018-01-16 * "PAGAMENTO TRIBUTI VARI | CODICE FISCALE: LNGFNC66H13C933I 16/01/2018 LONGHI FRANCESCO"
+  Assets:IT:BPS:Checking  -176.00 EUR ;imposta registro Boschetto
+  Expenses:IT:Taxes:Property
+
+2018-01-23 * "VERS. ASS. BANCARI ALTRE BANCHE | MILLY E POLO NORD"
+  Assets:IT:BPS:Checking  +2263.67 EUR
+  Income:Rent:Milli  -770.00 EUR
+  Income:Rent:Canturina:Expenses  -60.00 EUR
+  Income:Rent:Canturina:Electricity  -17.64 EUR
+  Income:Rent:Canturina:Water  -43.82 EUR
+  Income:Rent:Ballerini  -1326.00 EUR
+  Income:Rent:Canturina:Expenses  -10.00 EUR ;50.00 cash
+  Income:Rent:Canturina:Electricity  -19.60 EUR
+  Income:Rent:Canturina:Water  -14.61 EUR
+  Income:Rent:Taxes:Reimbursement  -2.00 EUR
+
+2018-01-18 * "IMPOSTE E TASSE | CODICE FISCALE: LNGFNC66H13C933I"
+  Assets:IT:BPS:Checking  -200.00 EUR ;imposta registro Caspani
+  Expenses:IT:Taxes:Property
+
+2018-01-19 * "PAGAMENTI DIVERSI | Pagamento utenze 200500304275694175 ENERXENIA S.P.A."
+  Assets:IT:BPS:Checking  -244.49 EUR
+  Expenses:Home:Gas
+
+2018-01-22 * "COMMISSIONI | Disposizione bonifico SCT Rif. VTP18022T0001478481090210900IT"
+  Assets:IT:BPS:Checking  -1.50 EUR
+  Expenses:IT:Bank:Fees
+
+2018-01-22 * "VOSTRA DISPOSIZIONE | Disposizione bonifico SCT Fv. A.P.E. COMO QUOTA ISCRIZIONE REGISTRO AMMINISTRATORI Rif. VTP18022T0001478481090210900IT"
+  Assets:IT:BPS:Checking  -50.00 EUR
+  Expenses:Work:Fees
+
+2018-01-18 * "PAGAMENTO TRIBUTI VARI | CODICE FISCALE: LNGFNC66H13C933I 22/01/2018"
+  Assets:IT:BPS:Checking  -67.00 EUR ;imposta registro risoluzione Ceei
+  Expenses:IT:Taxes:Property
+
+2018-01-25 * "PAGAMENTI DIVERSI | Pagamento utenze 097100290445475404 ENEL ENERGIA SPA"
+  Assets:IT:BPS:Checking  -181.07 EUR
+  Expenses:Home:Electricity
+
+2018-01-25 * "PAGAMENTO BOLLETTINO MAV | Pagamento MAV MAV Nr. 03359950717884238"
+  Assets:IT:BPS:Checking  -160.00 EUR
+  Expenses:Work:Fees
+
+2018-01-31 * "ADDEBITI PREAUTORIZZATI SDD-COMMERCIALE | SDD 0617620212 TELEPASS S.P.A. ID MANDATO:7013840000000747745140 SALDO DOCUM. 001169502 DEL 310118 TIPO:CORE-RCUR"
+  Assets:IT:BPS:Checking  -19.94 EUR
+  Expenses:Transport:Toll
+
+*** February
+ 2018-02-01 * "ADDEBITI PREAUTORIZZATI SDD-UTENZE | SDD 0617627548 WIND-TRE ID MANDATO:O66791P1080996584 215274487 93887618 249940062 W1800682670 5116TIPO:CORE-RCUR"
+  Assets:IT:BPS:Checking  -40.64 EUR
+  Expenses:Home:Phonternet
+
+2018-02-01 * "COMMISSIONI ADDEBITI PREAUTORIZZATI SDD | Addebito Preautorizzato SDD N. 0617627548"
+  Assets:IT:BPS:Checking  -0.60 EUR
+  Expenses:CH:Bank:Fees
+
+2018-02-09 * "PAGAMENTO BOLLO AUTO | Pagamento Bollo Auto Targa BF89949 scadenza 01/2019"
+  Assets:IT:BPS:Checking  -60.70 EUR
+  Expenses:Transport:InsuranceAndFees
+
+2018-02-09 * "COMMISSIONI | Disposizione bonifico SCT Rif. VTP18040T0063081481090210900IT"
+  Assets:IT:BPS:Checking  -1.50 EUR
+  Expenses:CH:Bank:Fees
+
+2018-02-09 * "VOSTRA DISPOSIZIONE | Disposizione bonifico SCT Fv. FONDAZIONE ORDINE DEGLI INGEGNERI DI COMORISANAMENTO DEFINITIVO DEGLI EDIFICI INTERESSRif. VTP18040T0063081481090210900IT"
+  Assets:IT:BPS:Checking  -24.40 EUR
+  Expenses:Work:Courses
+
+2018-02-12 * "RICARICA TELEFONICA | Pagamento Ricarica Telefonica Scrigno Operazione del 12/02/2018 alle 20:42 Ricarica WIND"
+  Assets:IT:BPS:Checking  -30.00 EUR ;ricarica babbo rimborsata
+  Expenses:Parents
+
+2018-02-13 * "ORDINE E CONTO | ORD. MABA S.R.L. SALDO AFFITTO febbraio Rif. 0843000908426407485129001600IT"
+  Assets:IT:BPS:Checking  +486.05 EUR
+  Income:Rent:Maba
+  Income:Rent:Canturina:Expenses  -30.00 EUR
+  Income:Rent:Taxes:Reimbursement  -2.00 EUR
+
+2018-02-15 * "ADDEBITO NEXI | POSIZIONE N. 0116300"
+  Assets:IT:BPS:Checking  -930.54 EUR
+  Liabilities:IT:Visa
+
+2018-02-15 * "ADDEBITI PREAUTORIZZATI SDD-FIDATY ORO | SDD 0521616770 FIDATI S.p.A. ID MANDATO:I650840000002335697A01 ADDEB.FIDATY ORO 7612152-2018-01 SDD 60170090TIPO:CORE-RCUR"
+  Assets:IT:BPS:Checking  -281.20 EUR
+  Expenses:Food:Groceries
+
+2018-02-21 * "VERS. ASS. BANCARI ALTRE BANCHE | il boschetto"
+  Assets:IT:BPS:Checking  +2310.79 EUR
+  Income:Rent:IlBoschetto  -2184.58 EUR
+  Income:Rent:Canturina:Water  -14.61 EUR
+  Income:Rent:Canturina:Electricity  -19.60 EUR
+  Income:Rent:Canturina:Expenses  -90.00 EUR
+  Income:Rent:Taxes:Reimbursement  -2.00 EUR
+
+2018-02-16 * "VOSTRA DISPOSIZIONE | PAGAMENTO PREMIO ASSICURATIVO PRODOTTO: 888 - INVESTIDOC FREE 2% PIANO RISPPOLIZZA: 00000000721532"
+  Assets:IT:BPS:Checking  -100.00 EUR
+  Expenses:IT:Bank:Insurance
+
+2018-02-20 * "ORDINE E CONTO | ORD. BALZAN CLEITON Fv. Francesco Longhi affitto + condominio. Rif. EA18021940904077481090010900IT"
+  Assets:IT:BPS:Checking  +525.30 EUR
+  Income:Rent:Balzan  -500.00 EUR
+  Income:Rent:Canturina:Electricity  -10.30 EUR
+  Income:Rent:Canturina:Expenses  -15.00 EUR
+
+2018-02-22 * "PAGAMENTI DIVERSI | Pagamento utenze 097100291026073083 ENEL ENERGIA SPA"
+  Assets:IT:BPS:Checking  -51.06 EUR
+  Expenses:Albatre:Electricity
+
+2018-02-22 * "PAGAMENTI DIVERSI | Pagamento utenze 097100290851271402 ENEL ENERGIA SPA"
+  Assets:IT:BPS:Checking  -55.71 EUR
+  Expenses:Canturina:Electricity
+
+2018-02-22 * "PAGAMENTI DIVERSI | Pagamento utenze 097100290851271503 ENEL ENERGIA SPA"
+  Assets:IT:BPS:Checking  -52.96 EUR
+  Expenses:Property:Electricity
+
+2018-02-22 * "PAGAMENTI DIVERSI | Pagamento utenze 200500304284603070 ENERXENIA S.P.A."
+  Assets:IT:BPS:Checking  -599.28 EUR
+  Expenses:Home:Gas
+
+2018-02-23 * "ORDINE E CONTO | ORD. P.E. PRIME EQUIPE S.R.L Fv. LONGHI FRANCESCO PAGAMENTO ANTICIPATO PRIMA RATA AFFITTO - MAGRif. 0306929497589809481091010910IT"
+  Assets:IT:BPS:Checking  +650.00 EUR
+  Income:Rent:PrimeEquipe
+
+2018-02-28 * "PAGAMENTO BOLLETTINO MAV | Pagamento MAV MAV Nr. 05696227819557315"
+  Assets:IT:BPS:Checking  -510.34 EUR
+  Expenses:Work:Retirement
+
+*** March
+2018-03-06 * "ORDINE E CONTO | ORD. MABA S.R.L. SALDO AFFITTO marzo Rif. 0843000912883312485129001600IT"
+  Assets:IT:BPS:Checking  +486.05 EUR
+  Income:Rent:Canturina:Expenses  -30.00 EUR
+  Income:Rent:Taxes:Reimbursement  -2.00 EUR
+  Income:Rent:Maba
+
+2018-03-06 * "ORDINE E CONTO | ORD. P.E. PRIME EQUIPE S.R.L Fv. LONGHI FRANCESCO VERSAMENTO DEPOSITO CAUZIONALE - TRE MENSILITRif. 0306925908325906481091010910IT"
+  Assets:IT:BPS:Checking  +1950.00 EUR
+  Liabilities:IT:RentDeposit
+
+2018-03-15 * "ADDEBITO NEXI | POSIZIONE N. 0116300"
+  Assets:IT:BPS:Checking  -121.53 EUR
+  Liabilities:IT:Visa
+
+2018-03-15 * "ADDEBITI PREAUTORIZZATI SDD-FIDATY ORO | SDD 0522035427 FIDATI S.p.A. ID MANDATO:I650840000002335697A01 ADDEB.FIDATY ORO 7747446-2018-02 SDD 60170090TIPO:CORE-RCUR"
+  Assets:IT:BPS:Checking  -318.05 EUR
+  Expenses:Food:Groceries
+
+2018-03-16 * "VOSTRA DISPOSIZIONE | PAGAMENTO PREMIO ASSICURATIVO PRODOTTO: 888 - INVESTIDOC FREE 2% PIANO RISPPOLIZZA: 00000000721532"
+  Assets:IT:BPS:Checking  -100.00 EUR
+  Expenses:IT:Bank:Insurance
+
+2018-03-21 * "RICARICA TELEFONICA | Pagamento Ricarica Telefonica Scrigno Operazione del 21/03/2018 alle 18:44 Ricarica WIND"
+  Assets:IT:BPS:Checking  -30.00 EUR
+  Expenses:Home:Phonternet
+
+2018-03-26 * "ADDEBITI PREAUTORIZZATI SDD-UTENZE | SDD 0618638170 WIND-TRE ID MANDATO:O66791P1080996584 220838941 97361864 255750020 W1804088370 5312TIPO:CORE-RCUR"
+  Assets:IT:BPS:Checking  -35.66 EUR
+  Expenses:Home:Phonternet
+
+2018-03-26 * "COMMISSIONI ADDEBITI PREAUTORIZZATI SDD | Addebito Preautorizzato SDD N. 0618638170"
+  Assets:IT:BPS:Checking  -0.60 EUR
+  Expenses:IT:Bank:Fees
+
+2018-03-26 * "PAGAMENTI DIVERSI | Pagamento utenze 097100291727117300 ENEL ENERGIA SPA"
+  Assets:IT:BPS:Checking  -201.67 EUR
+  Expenses:Home:Electricity
+
+*** April
+2018-04-04 * "COMMISSIONI | Disposizione bonifico SCT Rif. VTP18094T0021660481090210900IT"
+  Assets:IT:BPS:Checking  -1.50 EUR
+  Expenses:IT:Bank:Fees
+
+2018-04-04 * "VOSTRA DISPOSIZIONE | Disposizione bonifico SCT Fv. GENERALI ITALIA SPA - MAURO PETRELLI S.R.POLIZZA 763819903 Rif. VTP18094T0021660481090210900IT"
+  Assets:IT:BPS:Checking  -878.00 EUR
+  Expenses:Property:Insurance
+
+2018-03-31 * "COMPETENZE - ONERI, COMMISSIONI E SPESE | Liquidazione al 31/03/2018 c/c 066/0011383"
+  Assets:IT:BPS:Checking  -18.00 EUR
+  Expenses:CH:Bank:Fees
+
+2018-03-31 * "RECUPERO IMPOSTA DI BOLLO | Periodo dal 01/01/2018 al 31/03/2018 Conto Corrente n. 066/0011383"
+  Assets:IT:BPS:Checking  -8.55 EUR
+  Expenses:CH:Bank:Taxes
+
+2018-04-10 * "ORDINE E CONTO | ORD. GELATERIA ARTIGIANA DI FALAHA TAREK AFFITTO APRILE 2018 NOT-PROVIDED Rif. EA18040967039315481090010900IT"
+  Assets:IT:BPS:Checking  +782.00 EUR
+  Income:Rent:Falaha  -750.00 EUR
+  Income:Rent:Canturina:Expenses  -30.00 EUR
+  Income:Rent:Taxes:Reimbursement
+
+2018-04-11 * "ORDINE E CONTO | ORD. MABA S.R.L. SALDO AFFITTO aprile Rif. 0843000926152109485129001600IT"
+  Assets:IT:BPS:Checking  +486.05 EUR
+  Income:Rent:Maba  -454.05
+  Income:Rent:Canturina:Expenses  -30.00 EUR
+  Income:Rent:Taxes:Reimbursement
+
+2018-03-31 * "RECUPERO IMPOSTA DI BOLLO | Imposta sostitutiva di bollo su deposito titoli 066/498411"
+  Assets:IT:BPS:Checking  -1.20 EUR
+  Expenses:CH:Bank:Taxes
+
+2018-04-16 * "ADDEBITI PREAUTORIZZATI SDD-COMMERCIALE | SDD 0618966050 FONDAZIONE MINOPRIOVIALE RAIMOID MANDATO:E126840000000000006189 FT.N.0000000522 DEL 30/09/2017 TIPO:CORE-RCUR"
+  Assets:IT:BPS:Checking  -750.00 EUR
+  Expenses:Family:Children
+
+2018-04-16 * "COMMISSIONI ADDEBITI PREAUTORIZZATI SDD | Addebito Preautorizzato SDD N. 0618966050"
+  Assets:IT:BPS:Checking  -1.00 EUR
+  Expenses:IT:Bank:Fees
+
+2018-04-16 * "ADDEBITO NEXI | POSIZIONE N. 0116300"
+  Assets:IT:BPS:Checking  -232.05 EUR
+  Liabilities:IT:Visa
+
+2018-04-16 * "ADDEBITI PREAUTORIZZATI SDD-FIDATY ORO | SDD 0522553012 FIDATI S.p.A. ID MANDATO:I650840000002335697A01 ADDEB.FIDATY ORO 7889233-2018-03 SDD 60170090TIPO:CORE-RCUR"
+  Assets:IT:BPS:Checking  -431.30 EUR
+  Expenses:Food:Groceries
+
+2018-04-16 * "ORDINE E CONTO | ORD. P.E. PRIME EQUIPE S.R.L Fv. LONGHI FRANCESCO RATA AFFITTO MAGAZZINO - MESE APRILE 2018 - dRif. 0306927286612701481091010910IT"
+  Assets:IT:BPS:Checking  +572.00 EUR
+  Liabilities:IT:AccPayable  78.00 EUR ;imposta di registro versata da PE
+  Income:Rent:PrimeEquipe
+
+2018-04-16 * "debito imposta di registro"
+  Liabilities:IT:AccPayable -78.00 EUR
+  Expenses:Property:Fees
+
+2018-04-16 * "COMMISSIONI | Disposizione bonifico Rif. B0006620180416VT00062963"
+  Assets:IT:BPS:Checking  -1.00 EUR
+  Expenses:IT:Bank:Fees
+
+2018-04-16 * "VOSTRA DISPOSIZIONE | Disposizione bonifico Fv. INFRASTRUTTURE LOMBARDE SPA LONGHI FRANCESCO - 111100806658985245 Rif. B0006620180416VT00062963"
+  Assets:IT:BPS:Checking  -150.00 EUR
+  Expenses:Work:Office
+
+2018-04-17 * "VOSTRA DISPOSIZIONE | PAGAMENTO PREMIO ASSICURATIVO PRODOTTO: 888 - INVESTIDOC FREE 2% PIANO RISPPOLIZZA: 00000000721532"
+  Assets:IT:BPS:Checking  -100.00 EUR
+  Expenses:IT:Bank:Insurance
+
+2018-04-23 * "VERS. ASS. BANCARI ALTRE BANCHE | MILLI E BALLERINI"
+  Assets:IT:BPS:Checking  +2358.03 EUR
+  Income:Rent:Milli  -770.00 EUR
+  Income:Rent:Canturina:Expenses  -60.00 EUR
+  Income:Rent:Canturina:Electricity  -37.98 EUR
+  Income:Rent:Canturina:Water  -59.85 EUR
+  Income:Rent:Ballerini  -1326.00 EUR
+  Income:Rent:Canturina:Electricity  -42.20 EUR
+  Income:Rent:Canturina:Expenses  -60.00 EUR
+  Income:Rent:Taxes:Reimbursement
+
+2018-04-20 * "DIVISA | Rettifica Garanzia Import NUMERO : 00065FDC00629 COMMISSIONI GARANZIA 00065FDC00629 DAL 12/04/2018 ALL'11/04/2019 GG365"
+  Assets:IT:BPS:Checking  -405.56 EUR
+  Expenses:IT:Bank:Fidejussione
+
+2018-04-26 * "PAGAMENTI DIVERSI | Pagamento utenze 097100292262485746 ENEL ENERGIA SPA"
+  Assets:IT:BPS:Checking  -60.84 EUR
+  Expenses:Canturina:Electricity
+
+2018-04-26 * "PAGAMENTI DIVERSI | Pagamento utenze 097100292262485847 ENEL ENERGIA SPA"
+  Assets:IT:BPS:Checking  -59.67 EUR
+  Expenses:Property:Electricity
+
+2018-04-26 * "PAGAMENTI DIVERSI | Pagamento utenze 097100292214554556 ENEL ENERGIA SPA"
+  Assets:IT:BPS:Checking  -57.73 EUR
+  Expenses:Albatre:Electricity
+
+2018-04-26 * "PAGAMENTI DIVERSI | Pagamento utenze 200500304305008078 ENERXENIA S.P.A."
+  Assets:IT:BPS:Checking  -695.85 EUR
+  Expenses:Home:Gas
+
+2018-04-27 * "RICARICA TELEFONICA | Pagamento Ricarica Telefonica Scrigno Operazione del 27/04/2018 alle 16:04 Ricarica WIND"
+  Assets:IT:BPS:Checking  -30.00 EUR
+  Expenses:Home:Phonternet
+
+2018-04-30 * "PAGAMENTO BOLLETTINO MAV | Pagamento MAV MAV Nr. 05696232409935621"
+  Assets:IT:BPS:Checking  -510.34 EUR
+  Expenses:Work:Retirement
+
+2018-04-30 * "PAGAMENTO RATA FINANZIAMENTO | MUTUO IPOTECARIO PAGAMENTO RATA 00065/01046487 INTESTATO A: LONGHI FRANCESCO TARBINI PAOLA"
+  Assets:IT:BPS:Checking  -2964.44 EUR
+  Liabilities:IT:Mortgage
+
+*** May
+2018-05-02 * "ADDEBITI PREAUTORIZZATI SDD-COMMERCIALE | SDD 0619270114 TELEPASS S.P.A. ID MANDATO:7013840000000747745140 SALDO DOCUM. 008825921 DEL 300418 TIPO:CORE-RCUR"
+  Assets:IT:BPS:Checking  -18.44 EUR
+  Expenses:Transport:Toll
+
+2018-05-02 * "PAGAMENTI DIVERSI | Pagamento utenze 200071800051390033 ACSM AGAM SPA"
+  Assets:IT:BPS:Checking  -379.03 EUR
+  Expenses:Canturina:Water
+
+2018-05-02 * "PAGAMENTI DIVERSI | Pagamento utenze 200071800033260083 ACSM AGAM SPA"
+  Assets:IT:BPS:Checking  -225.44 EUR
+  Expenses:Colli:Water
+
+2018-05-02 * "PAGAMENTI DIVERSI | Pagamento utenze 200071800082680081 ACSM AGAM SPA"
+  Assets:IT:BPS:Checking  -123.89 EUR
+  Expenses:Property:Water
+
+2018-05-02 * "PAGAMENTI DIVERSI | Pagamento utenze 200071800082690088 ACSM AGAM SPA"
+  Assets:IT:BPS:Checking  -340.19 EUR
+  Expenses:Albatre:Water
+
+2018-05-02 * "PAGAMENTO BOLLO AUTO | Pagamento Bollo Auto Targa CJ015WZ scadenza 04/2019"
+  Assets:IT:BPS:Checking  -243.00 EUR
+  Expenses:Transport:InsuranceAndFees
+
+2018-05-07 * "ORDINE E CONTO | ORD. MABA S.R.L. SALDO AFFITTO maggio Rif. 0843000933232603485129001600IT"
+  Assets:IT:BPS:Checking  +506.00 EUR
+  Income:Rent:Maba  -455.05 EUR
+  Income:Rent:Canturina:Water  -19.95 EUR
+  Income:Rent:Canturina:Expenses  -30.00 EUR
+  Income:Rent:Taxes:Reimbursement
+
+2018-05-08 * "ORDINE E CONTO | ORD. GELATERIA ARTIGIANA DI FALAHA TAREK AFFITTO MAGGIO 2018 NOT-PROVIDED Rif. EA18050580322412481090010900IT"
+  Assets:IT:BPS:Checking  +782.00 EUR
+  Income:Rent:Canturina:Expenses  -30.00 EUR
+  Income:Rent:Taxes:Reimbursement  -2.00 EUR
+  Income:Rent:Falaha
+
+2018-05-10 * "BONIFICO SOGGETTO A RITENUTA D'ACCONTO | ORD. GRIMAUDO ROSARIO DELLA VALLE ALESSANDRA PAG. FT. NUMERO 01/18 DEL 09/05/2018 PRESTAZIONI TECNICHE RECUPERO SOTTOTETTO DETRAZIONE 5Rif. EA18050983013235ZX1090010900IT"
+  Assets:IT:BPS:Checking  +971.80 EUR
+  Income:Work
+
+2018-05-12 * "RICARICA TELEFONICA | Pagamento Ricarica Telefonica Scrigno Operazione del 12/05/2018 alle 09:26 Ricarica WIND"
+  Assets:IT:BPS:Checking  -50.00 EUR
+  Expenses:Parents
+
+2018-05-15 * "ADDEBITO NEXI | POSIZIONE N. 0116300"
+  Assets:IT:BPS:Checking  -192.40 EUR
+  Liabilities:IT:Visa
+
+2018-05-15 * "ADDEBITI PREAUTORIZZATI SDD-FIDATY ORO | SDD 0523073610 FIDATI S.p.A. ID MANDATO:I650840000002335697A01 ADDEB.FIDATY ORO 8024680-2018-04 SDD 60170090TIPO:CORE-RCUR"
+  Assets:IT:BPS:Checking  -360.70 EUR
+  Expenses:Food:Groceries
+
+2018-05-15 * "PAGAMENTO TRIBUTI VARI | CODICE FISCALE: LNGFNC66H13C933I 15/05/2018 LONGHI FRANCESCO"
+  Assets:IT:BPS:Checking  -212.00 EUR ;Tari acconto
+  Expenses:Home:Garbage
+
+2018-05-21 * "VERS. ASS. BANCARI ALTRE BANCHE | mezzanzanica - robbiani - bianco"
+  Assets:IT:BPS:Checking  +6805.58 EUR
+  Income:Rent:Mezzanzanica  -1440.00 EUR
+  Income:Rent:Canturina:Electricity  -40.80 EUR
+  Income:Rent:Canturina:Expenses  -120.00 EUR
+  Income:Rent:Canturina:Water  -69.11 EUR
+  Income:Rent:Mezzanzanica  -23.20 EUR ;aumento non applicato precedentemente
+  Income:Rent:Robbiani  -2400.00 EUR
+  Income:Rent:Canturina:Expenses  -120.00 EUR
+  Income:Rent:Canturina:Water  -103.67 EUR
+  Income:Rent:Canturina:Electricity  -48.96 EUR
+  Income:Rent:IlBoschetto  -2184.58 EUR
+  Income:Rent:Canturina:Electricity  -42.20 EUR
+  Income:Rent:IlBoschetto  -13.11 EUR ;Istat
+  Income:Rent:Canturina:Expenses  -90.00 EUR
+  Income:Rent:Canturina:Water  -19.95 EUR
+  Income:Rent:Taxes:Reimbursement  -88.00 EUR
+  Income:Rent:Taxes:Reimbursement  -2.00 EUR
+
+2018-05-16 * "ORDINE E CONTO | ORD. P.E. PRIME EQUIPE S.R.L Fv. LONGHI FRANCESCO PAGAMENTO AFFITTO UNITA. LOCALE + SPESE APRILRif. 0306928337628207481091010910IT"
+  Assets:IT:BPS:Checking  +710.00 EUR
+  Income:Rent:PrimeEquipe  -650.00 EUR
+  Income:Rent:Canturina:Expenses  -60.00 EUR ;2 months
+
+2018-05-16 * "VOSTRA DISPOSIZIONE | PAGAMENTO PREMIO ASSICURATIVO PRODOTTO: 888 - INVESTIDOC FREE 2% PIANO RISPPOLIZZA: 00000000721532"
+  Assets:IT:BPS:Checking  -100.00 EUR
+  Expenses:IT:Bank:Insurance
+
+2018-05-23 * "CEDOLE E DIVIDENDI | 736 BCA POP SONDRIO ORD"
+  Assets:IT:BPS:Checking  +38.12 EUR
+  Income:Bank:Interest
+
+2018-05-25 * "ORDINE E CONTO | ORD. GI.TI.GEST. S.R.L. NOTA INFORMATIVA GTGS 18.052 Rif. 0311164555414401485147010900IT"
+  Assets:IT:BPS:Checking  +634.00 EUR
+  Income:Work
+
+2018-05-28 * "PAGAMENTI DIVERSI | Pagamento utenze 097100292973829507 ENEL ENERGIA SPA"
+  Assets:IT:BPS:Checking  -178.59 EUR
+  Expenses:Home:Electricity
+
+2018-05-29 * "COMMISSIONI | Disposizione bonifico SCT Rif. VTP18149T0037482481090210900IT"
+  Assets:IT:BPS:Checking  -1.50 EUR
+  Expenses:IT:Bank:Fees
+
+2018-05-29 * "VOSTRA DISPOSIZIONE | Disposizione bonifico SCT Fv. Mauro Priolo Broker Assicurazione auto targa CJ015WZ Rif. VTP18149T0037482481090210900IT"
+  Assets:IT:BPS:Checking  -410.00 EUR
+  Expenses:Transport:InsuranceAndFees
+
+2018-05-31 * "COMMISSIONI | Disposizione bonifico SCT Rif. VTP18151T0038842481090210900IT"
+  Assets:IT:BPS:Checking  -1.50 EUR
+  Expenses:IT:Bank:Fees
+
+2018-05-31 * "VOSTRA DISPOSIZIONE | Disposizione bonifico SCT Fv. MAURO PRIOLO BROKER EL10855 Rif. VTP18151T0038842481090210900IT"
+  Assets:IT:BPS:Checking  -847.00 EUR
+  Expenses:Transport:InsuranceAndFees
+
+*** June
+2018-06-04 * "ADDEBITI PREAUTORIZZATI SDD-UTENZE | SDD 0619819974 WIND-TRE ID MANDATO:O66791P1080996584 227695640 101927484 264956727 W1808363370 551TIPO:CORE-RCUR"
+  Assets:IT:BPS:Checking  -61.37 EUR
+  Expenses:Home:Phonternet
+
+2018-06-04 * "COMMISSIONI ADDEBITI PREAUTORIZZATI SDD | Addebito Preautorizzato SDD N. 0619819974"
+  Assets:IT:BPS:Checking  -0.60 EUR
+  Expenses:IT:Bank:Fees
+
+2018-06-06 * "ORDINE E CONTO | ORD. MABA S.R.L. SALDO AFFITTO giugno Rif. 0843000942666703485129001600IT"
+  Assets:IT:BPS:Checking  486.05 EUR
+  Income:Rent:Canturina:Expenses  -30.00 EUR
+  Income:Rent:Taxes:Reimbursement  -2.00 EUR
+  Income:Rent:Maba
+
+2018-06-08 * "PAGAMENTO BOLLETTINO MAV | Pagamento MAV MAV Nr. 05696234124453087"
+  Assets:IT:BPS:Checking  -510.34 EUR
+  Expenses:Work:Retirement
+
+2018-06-14 * "VERS. ASS. BANCARI ALTRE BANCHE | TARABBIA"
+  Assets:IT:BPS:Checking  2085.56 EUR
+  Income:Rent:Canturina:Electricity  -31.00 EUR
+  Income:Rent:Canturina:Expenses  -120.00 EUR
+  Income:Rent:Canturina:Water  -34.56 EUR
+  Income:Rent:Tarabbia
+
+2018-06-14 * "BONIFICO SOGGETTO A RITENUTA D'ACCONTO | ORD. GRIMAUDO ROSARIO DELLA VALLE ALESSANDRA PAG. FT. NUMERO 03/18 DEL 13/06/2018 PRESTAZIONI TECNICHE RECUPERO SOTTOTETTO DETRAZIONE 5Rif. EA18061399796167ZX1090010900IT"
+  Assets:IT:BPS:Checking  570.93 EUR
+  Income:Work
+
+2018-06-15 * "ADDEBITO NEXI | POSIZIONE N. 0116300"
+  Assets:IT:BPS:Checking  -220.06 EUR
+  Liabilities:IT:Visa
+  
+2018-06-15 * "ADDEBITI PREAUTORIZZATI SDD-FIDATY ORO | SDD 0523612071 FIDATI S.p.A. ID MANDATO:I650840000002335697A01 ADDEB.FIDATY ORO 8170706-2018-05 SDD 60170090TIPO:CORE-RCUR"
+  Assets:IT:BPS:Checking  -400.70 EUR
+  Expenses:Food:Groceries
+
+2018-06-18 * "ORDINE E CONTO | ORD. P.E. PRIME EQUIPE S.R.L Fv. LONGHI FRANCESCO SALDO RICEVUTA DI AFFITTO NR. 733 DEL 15/06/2Rif. 0306929447462503481091010910IT"
+  Assets:IT:BPS:Checking  704.48 EUR
+  Income:Rent:Colli:Water  -22.48 EUR
+  Income:Rent:Taxes:Reimbursement  -2.00 EUR
+  Income:Rent:Canturina:Expenses  -30.00 EUR
+  Income:Rent:PrimeEquipe
+
+2018-06-18 * "VOSTRA DISPOSIZIONE | PAGAMENTO PREMIO ASSICURATIVO PRODOTTO: 888 - INVESTIDOC FREE 2% PIANO RISPPOLIZZA: 00000000721532"
+  Assets:IT:BPS:Checking  -100.00 EUR
+  Expenses:IT:Bank:Insurance
+
+2018-06-18 * "PAGAMENTI DIVERSI | Pagamento utenze 200071800204960024 ACSM AGAM SPA"
+  Assets:IT:BPS:Checking  -385.54 EUR
+  Expenses:Canturina:Water
+
+2018-06-18 * "PAGAMENTI DIVERSI | Pagamento utenze 200071800236090053 ACSM AGAM SPA"
+  Assets:IT:BPS:Checking  -96.70 EUR
+  Expenses:Property:Water
+
+2018-06-18 * "PAGAMENTI DIVERSI | Pagamento utenze 097100293569211055 ENEL ENERGIA SPA"
+  Assets:IT:BPS:Checking  -60.26 EUR
+  Expenses:Canturina:Electricity
+
+2018-06-18 * "PAGAMENTI DIVERSI | Pagamento utenze 097100293569211156 ENEL ENERGIA SPA"
+  Assets:IT:BPS:Checking  -59.21 EUR
+  Expenses:Property:Electricity
+
+2018-06-18 * "PAGAMENTO TRIBUTI VARI | CODICE FISCALE: LNGFNC66H13C933I 18/06/2018 LONGHI FRANCESCO"
+  Assets:IT:BPS:Checking  -7017.00 EUR
+  Expenses:IT:Taxes:Property
+
+2018-06-18 * "PAGAMENTO TRIBUTI VARI | CODICE FISCALE: TRBPLA67E52C933U 18/06/2018 TARBINI PAOLA"
+  Assets:IT:BPS:Checking  -109.00 EUR
+  Expenses:IT:Taxes:Property
+
+2018-06-19 * "ORDINE E CONTO | ORD. GELATERIA ARTIGIANA DI FALAHA TAREK AFFITTO GIUGNO 2018 Rif. EA18061801996808481090010900IT"
+  Assets:IT:BPS:Checking  782.00 EUR
+  Income:Rent:Falaha  -750.00 EUR
+  Income:Rent:Canturina:Expenses  -30.00 EUR
+  Income:Rent:Taxes:Reimbursement
+
+2018-06-21 * "PAGAMENTI DIVERSI | Pagamento utenze 200500304323999890 ENERXENIA S.P.A."
+  Assets:IT:BPS:Checking  -224.21 EUR
+  Expenses:Home:Gas
+
+*** July
+2018-06-30 * "RICARICA TELEFONICA | Pagamento Ricarica Telefonica Scrigno Operazione del 30/06/2018 alle 19:10 Ricarica WIND"
+  Assets:IT:BPS:Checking  -30.00 EUR
+  Expenses:Home:Phonternet
+
+2018-07-02 * "PAGAMENTO TRIBUTI VARI | CODICE FISCALE: LNGFNC66H13C933I 02/07/2018 LONGHI FRANCESCO"
+  Assets:IT:BPS:Checking  -1622.98 EUR
+  Expenses:IT:Taxes:Unico
+
+2018-07-02 * "PAGAMENTO TRIBUTI VARI | CODICE FISCALE: LNGFNC66H13C933I 02/07/2018 LONGHI FRANCESCO"
+  Assets:IT:BPS:Checking  -127.60 EUR
+  Expenses:IT:Taxes:Unico
+
+2018-06-30 * "COMPETENZE - ONERI, COMMISSIONI E SPESE | Liquidazione al 30/06/2018 c/c 066/0011383"
+  Assets:IT:BPS:Checking  -18.00 EUR
+  Expenses:IT:Bank:Fees
+
+2018-06-30 * "RECUPERO IMPOSTA DI BOLLO | Periodo dal 01/04/2018 al 30/06/2018 Conto Corrente n. 066/0011383"
+  Assets:IT:BPS:Checking  -8.55 EUR
+  Expenses:IT:Bank:Taxes
+
+2018-07-04 * "ADDEBITI PREAUTORIZZATI SDD-COMMERCIALE | SDD 0620409410 TELEPASS PAY ID MANDATO:B6H6Q40000000190497465 DOC. 015580340 DEL 300618 TIPO:CORE-RCUR"
+  Assets:IT:BPS:Checking  -9.32 EUR
+  Expenses:Transport:Toll
+
+2018-07-04 * "COMMISSIONI ADDEBITI PREAUTORIZZATI SDD | Addebito Preautorizzato SDD N. 0620409410"
+  Assets:IT:BPS:Checking  -1.00 EUR
+  Expenses:IT:Bank:Fees
+
+2018-07-05 * "ORDINE E CONTO | ORD. MABA S.R.L. SALDO AFFITTO luglio Rif. 0843000952303906485129001600IT"
+  Assets:IT:BPS:Checking  507.47 EUR
+  Income:Rent:Canturina:Expenses  -30.00 EUR
+  Income:Rent:Canturina:Water  -21.42 EUR
+  Income:Rent:Taxes:Reimbursement  -2.00 EUR
+  Income:Rent:Maba
+
+2018-07-06 * "COMMISSIONI | Disposizione bonifico SCT Rif. VTP18187T0034417481090210900IT"
+  Assets:IT:BPS:Checking  -1.50 EUR
+  Expenses:IT:Bank:Fees
+
+2018-07-06 * "VOSTRA DISPOSIZIONE | Disposizione bonifico SCT Fv. CONDOMINIO MAIA 1 RATA SPESE CONDOMINIALI Rif. VTP18187T0034417481090210900IT"
+  Assets:IT:BPS:Checking  -100.81 EUR
+  Expenses:Property:Maia
+
+2018-07-11 * "BONIFICO SOGGETTO A RITENUTA D'ACCONTO | ORD. GRIMAUDO ROSARIO DELLA VALLE ALESSANDRA PAG. FT. NUMERO 04/18 DEL 03/07/2018 PRESTAZIONI TECNICHE RECUPERO SOTTOTETTO DETRAZIONE 5Rif. EA18071013343507ZX1090010900IT"
+  Assets:IT:BPS:Checking  570.93 EUR
+  Income:Work
+
+2018-06-30 * "RECUPERO IMPOSTA DI BOLLO | Imposta sostitutiva di bollo su deposito titoli 066/498411"
+  Assets:IT:BPS:Checking  -1.30 EUR
+  Expenses:IT:Bank:Taxes
+
+2018-07-16 * "ADDEBITO NEXI | POSIZIONE N. 0116300"
+  Assets:IT:BPS:Checking  -396.97 EUR
+  Liabilities:IT:Visa
+  
+2018-07-16 * "ADDEBITI PREAUTORIZZATI SDD-FIDATY ORO | SDD 0524410005 FIDATI S.p.A. ID MANDATO:I650840000002335697A01 ADDEB.FIDATY ORO 8305884-2018-06 SDD 60170090TIPO:CORE-RCUR"
+  Assets:IT:BPS:Checking  -287.25 EUR
+  Expenses:Food:Groceries
+
+2018-07-16 * "PAGAMENTO TRIBUTI VARI | CODICE FISCALE: LNGFNC66H13C933I 16/07/2018 LONGHI FRANCESCO"
+  Assets:IT:BPS:Checking  -325.31 EUR
+  Expenses:IT:Taxes:Unico
+
+2018-07-16 * "PAGAMENTO TRIBUTI VARI | CODICE FISCALE: LNGFNC66H13C933I 16/07/2018 LONGHI FRANCESCO"
+  Assets:IT:BPS:Checking  -1428.07 EUR
+  Expenses:IT:Taxes:Unico
+
+2018-07-17 * "ORDINE E CONTO | ORD. P.E. PRIME EQUIPE S.R.L Fv. LONGHI FRANCESCO SALDO RICEVUTA DI AFFITTO 742 DEL 15/07/2018 Rif. 0306926553048600481091010910IT"
+  Assets:IT:BPS:Checking  682.00 EUR
+  Income:Rent:Canturina:Expenses  -30.00
+  Income:Rent:Taxes:Reimbursement  -2.00 EUR
+  Income:Rent:PrimeEquipe
+
+2018-07-17 * "VOSTRA DISPOSIZIONE | PAGAMENTO PREMIO ASSICURATIVO PRODOTTO: 888 - INVESTIDOC FREE 2% PIANO RISPPOLIZZA: 00000000721532"
+  Assets:IT:BPS:Checking  -100.00 EUR
+  Expenses:IT:Bank:Insurance
+
+2018-07-20 * "ADDEBITI PREAUTORIZZATI SDD-UTENZE | SDD 0620679858 WIND-TRE ID MANDATO:O66791P1080996584 231366961 103944806 269318251 W1810981281 564TIPO:CORE-RCUR"
+  Assets:IT:BPS:Checking  -65.59 EUR
+  Expenses:Home:Phonternet
+
+2018-07-20 * "COMMISSIONI ADDEBITI PREAUTORIZZATI SDD | Addebito Preautorizzato SDD N. 0620679858"
+  Assets:IT:BPS:Checking  -0.60 EUR
+  Expenses:IT:Bank:Fees
+
+2018-07-31 * "VERS. ASS. BANCARI ALTRE BANCHE | MILLI E POLO NORD"
+  Assets:IT:BPS:Checking  2357.83 EUR
+  Income:Rent:Milli  -770.00 EUR
+  Income:Rent:Canturina:Electricity  -35.82 EUR
+  Income:Rent:Canturina:Water  -64.26 EUR
+  Income:Rent:Canturina:Expenses  -60.00 EUR
+  Income:Rent:Canturina:Water  -19.95 EUR
+  Income:Rent:Canturina:Expenses  -60.00 EUR
+  Income:Rent:Canturina:Electricity  -19.80 EUR
+  Income:Rent:Taxes:Reimbursement  -2.00 EUR
+  Income:Rent:Ballerini  
+
+2018-07-26 * "ORDINE E CONTO | ORD. SKANDIA LEBEN (FL) AG RUCKZAHLUNG HERALD FUND 071555TRC073768 Rif. COR0726AA2602740"
+  Assets:IT:BPS:Checking  5671.62 EUR
+  Income:Funds:Reimbursement
+
+2018-07-27 * "PAGAMENTI DIVERSI | Pagamento utenze 097100294146543836 ENEL ENERGIA SPA"
+  Assets:IT:BPS:Checking  -147.27 EUR
+  Expenses:Home:Electricity
+
+*** August
+2018-08-01 * "ADDEBITI PREAUTORIZZATI SDD-COMMERCIALE | SDD 0620772246 AGOS DUCATO SPA ID MANDATO:3128740100000058994160 PR. 58994160/001/01 01/08/18 TIPO:CORE-FRST"
+  Assets:IT:BPS:Checking  -434.17 EUR
+  Expenses:Personal:Leisure
+
+2018-08-01 * "COMMISSIONI ADDEBITI PREAUTORIZZATI SDD | Addebito Preautorizzato SDD N. 0620772246"
+  Assets:IT:BPS:Checking  -1.00 EUR
+  Expenses:IT:Bank:Fees
+
+2018-08-02 * "ORDINE E CONTO | ORD. P.E. PRIME EQUIPE S.R.L Fv. LONGHI FRANCESCO SALDO RICEVUTA 745 DEL 15/08/2018 Rif. 0306927169767502481091010910IT"
+  Assets:IT:BPS:Checking  682.00 EUR
+  Income:Rent:PrimeEquipe  -650.00 EUR
+  Income:Rent:Canturina:Expenses  -30.00 EUR
+  Income:Rent:Taxes:Reimbursement
+
+2018-08-06 * "VOSTRA DISPOSIZIONE | PAGAMENTO PREMIO ASSICURATIVO PRODOTTO: 595 - DICASA POLIZZA: 01359505574123"
+  Assets:IT:BPS:Checking  -275.00 EUR
+  Expenses:Property:Insurance
+
+2018-08-06 * "ORDINE E CONTO | ORD. AZIMUT CAPITAL MANAGEMENT SGR SPA PARTE DEL CLIENTE RICHIESTA DI GIROCONTO DA Rif. ZD19215ZD9652992"
+  Assets:IT:BPS:Checking  30000.00 EUR
+  Income:Funds:Reimbursement
+
+2018-08-14 * "ORDINE E CONTO | ORD. GELATERIA ARTIGIANA DI FALAHA TAREK AFFITTO LUGLIO Rif. EA18081329849288481090010900IT"
+  Assets:IT:BPS:Checking  782.00 EUR
+  Income:Rent:Falaha  -750.00 EUR
+  Income:Rent:Canturina:Expenses  -30.00 EUR
+  Income:Rent:Taxes:Reimbursement
+
+2018-08-16 * "ADDEBITI PREAUTORIZZATI SDD-FIDATY ORO | SDD 0524872097 FIDATI S.p.A. ID MANDATO:I650840000002335697A01 ADDEB.FIDATY ORO 8437881-2018-07 SDD 60170090TIPO:CORE-RCUR"
+  Assets:IT:BPS:Checking  -284.65 EUR
+  Expenses:Food:Groceries
+
+2018-08-16 * "ADDEBITO NEXI | POSIZIONE N. 0116300"
+  Assets:IT:BPS:Checking  -1301.92 EUR
+  Liabilities:IT:Visa
+
+2018-08-22 * "VERS. ASS. BANCARI ALTRE BANCHE | IL BOSCHETTO"
+  Assets:IT:BPS:Checking  2197.69 EUR
+  Income:Rent:IlBoschetto  -2184.58 EUR
+  Income:Rent:Canturina:Water  -21.42 EUR
+  Income:Rent:Canturina:Electricity  -32.40 EUR
+  Income:Rent:Canturina:Expenses  -90.00 EUR
+  Income:Rent:Taxes:Reimbursement
+
+2018-08-17 * "VOSTRA DISPOSIZIONE | PAGAMENTO PREMIO ASSICURATIVO PRODOTTO: 888 - INVESTIDOC FREE 2% PIANO RISPPOLIZZA: 00000000721532"
+  Assets:IT:BPS:Checking  -100.00 EUR
+  Expenses:IT:Bank:Insurance
+
+2018-08-20 * "PAGAMENTI DIVERSI | Pagamento utenze 097100294798013381 ENEL ENERGIA SPA"
+  Assets:IT:BPS:Checking  -57.12 EUR
+  Expenses:Canturina:Electricity
+
+2018-08-20 * "PAGAMENTI DIVERSI | Pagamento utenze 097100294798013482 ENEL ENERGIA SPA"
+  Assets:IT:BPS:Checking  -56.43 EUR
+  Expenses:Property:Electricity
+
+2018-08-20 * "PAGAMENTO TRIBUTI VARI | CODICE FISCALE: LNGFNC66H13C933I 20/08/2018 LONGHI FRANCESCO"
+  Assets:IT:BPS:Checking  -1432.76 EUR
+  Expenses:IT:Taxes:Unico
+
+2018-08-20 * "PAGAMENTO TRIBUTI VARI | CODICE FISCALE: LNGFNC66H13C933I 20/08/2018 LONGHI FRANCESCO"
+  Assets:IT:BPS:Checking  -326.40 EUR
+  Expenses:IT:Taxes:Unico
+
+2018-08-22 * "PAGAMENTI DIVERSI | Pagamento utenze 200500304345795757 ENERXENIA S.P.A."
+  Assets:IT:BPS:Checking  -289.94 EUR
+  Expenses:Home:Gas
+
+2018-08-27 * "RICARICA TELEFONICA | Pagamento Ricarica Telefonica Scrigno Operazione del 27/08/2018 alle 10:25 Ricarica WIND"
+  Assets:IT:BPS:Checking  -30.00 EUR
+  Expenses:Home:Phonternet
+
+2018-08-30 * "PAGAMENTO BOLLETTINO MAV | Pagamento MAV MAV Nr. 05696235153403774"
+  Assets:IT:BPS:Checking  -510.34 EUR
+  Expenses:Work:Retirement
+
+2018-08-31 * "ORDINE E CONTO | ORD. GELATERIA ARTIGIANA DI FALAHA TAREK AFFITTO AGOSTO 2018 Rif. EA18083035780553481090010900IT"
+  Assets:IT:BPS:Checking  782.00 EUR
+  Income:Rent:Falaha  -750.00 EUR
+  Income:Rent:Canturina:Expenses  -30.00 EUR
+  Income:Rent:Taxes:Reimbursement
+  
+*** September
+2018-09-03 * "ADDEBITI PREAUTORIZZATI SDD-COMMERCIALE | SDD 0621383592 AGOS DUCATO SPA ID MANDATO:3128740100000058994160 PR. 58994160/002/01 01/09/18 TIPO:CORE-RCUR"
+  Assets:IT:BPS:Checking  -418.17 EUR
+  Expenses:Personal:Leisure  ;Honda
+
+2018-09-03 * "COMMISSIONI ADDEBITI PREAUTORIZZATI SDD | Addebito Preautorizzato SDD N. 0621383592"
+  Assets:IT:BPS:Checking  -1.00 EUR
+  Expenses:IT:Bank:Fees
+
+2018-09-04 * "PAGAMENTO TRIBUTI VARI | CODICE FISCALE: LNGFNC66H13C933I 04/09/2018 LONGHI FRANCESCO"
+  Assets:IT:BPS:Checking  -107.00 EUR
+  Expenses:IT:Taxes:Property
+
+2018-09-04 * "PAGAMENTO TRIBUTI VARI | CODICE FISCALE: LNGFNC66H13C933I 04/09/2018 LONGHI FRANCESCO"
+  Assets:IT:BPS:Checking  -110.00 EUR
+  Expenses:IT:Taxes:Property
+
+2018-09-10 * "PAGAMENTI DIVERSI | Pagamento utenze 200071800332050079 ACSM AGAM SPA"
+  Assets:IT:BPS:Checking  -208.64 EUR
+  Expenses:Canturina:Water
+
+2018-09-10 * "PAGAMENTI DIVERSI | Pagamento utenze 200071800351690063 ACSM AGAM SPA"
+  Assets:IT:BPS:Checking  -112.02 EUR
+  Expenses:Home:Water
+
+2018-09-10 * "PAGAMENTI DIVERSI | Pagamento utenze 200071800318970037 ACSM AGAM SPA"
+  Assets:IT:BPS:Checking  -86.57 EUR
+  Expenses:Colli:Water
+
+2018-09-10 * "ORDINE E CONTO | ORD. MABA S.R.L. SALDO AFFITTO agosto e settembre Rif. 0843000971055510485129001600IT"
+  Assets:IT:BPS:Checking  1043.80 EUR
+  Income:Rent:Maba  -913.21 EUR  ;2 months
+  Income:Rent:Canturina:Water  -11.59 EUR
+  Income:Rent:Canturina:Expenses  -60.00 EUR
+  Income:Rent:Taxes:Reimbursement  -59.00 EUR  ;+ imposta di registro
+
+2018-09-10 * "COMMISSIONI | Disposizione bonifico SCT Rif. VTP18253T0035674481090210900IT"
+  Assets:IT:BPS:Checking  -1.50 EUR
+  Expenses:IT:Bank:Fees
+
+2018-09-10 * "VOSTRA DISPOSIZIONE | Disposizione bonifico SCT Fv. CONDOMINIO MAIA 2 RATA SPESE CONDOMINIALI Rif. VTP18253T0035674481090210900IT"
+  Assets:IT:BPS:Checking  -50.81 EUR
+  Expenses:Property:Maia
+
+2018-09-11 * "RICARICA TELEFONICA | Pagamento Ricarica Telefonica Scrigno Operazione del 11/09/2018 alle 18:25 Ricarica WIND"
+  Assets:IT:BPS:Checking  -50.00 EUR
+  Expenses:Parents
+
+2018-09-14 * "BONIFICO SOGGETTO A RITENUTA D'ACCONTO | ORD. GRIMAUDO ROSARIO DELLA VALLE ALESSANDRA PAG. FT. NUMERO 05/18 DEL 11/09/2018 PRESTAZIONI TECNICHE RECUPERO SOTTOTETTO DETRAZIONE 5Rif. EA18091342163604ZX1090010900IT"
+  Assets:IT:BPS:Checking  570.93 EUR
+  Income:Work
+
+2018-09-17 * "ADDEBITO NEXI | POSIZIONE N. 0116300"
+  Assets:IT:BPS:Checking  -505.46 EUR
+  Liabilities:IT:Visa
+
+2018-09-17 * "ADDEBITI PREAUTORIZZATI SDD-FIDATY ORO | SDD 0525277669 FIDATI S.p.A. ID MANDATO:I650840000002335697A01 ADDEB.FIDATY ORO 8580286-2018-08 SDD 60170090TIPO:CORE-RCUR"
+  Assets:IT:BPS:Checking  -744.90 EUR
+  Expenses:Food:Groceries
+
+2018-09-17 * "ORDINE E CONTO | ORD. P.E. PRIME EQUIPE S.R.L Fv. LONGHI FRANCESCO RICEVUTA DI AFFITTO N. 760 DEL 15/09/18 Rif. 0306928595384609481091010910IT"
+  Assets:IT:BPS:Checking  725.00 EUR
+  Income:Rent:PrimeEquipe  -650.00 EUR
+  Income:Rent:Colli:Water  -45.00 EUR
+  Income:Rent:Canturina:Expenses  -30.00 EUR
+
+2018-09-17 * "PAGAMENTO TRIBUTI VARI | CODICE FISCALE: LNGFNC66H13C933I 17/09/2018 LONGHI FRANCESCO"
+  Assets:IT:BPS:Checking  -1437.46 EUR
+  Expenses:IT:Taxes:Unico
+
+2018-09-17 * "PAGAMENTO TRIBUTI VARI | CODICE FISCALE: LNGFNC66H13C933I 17/09/2018 LONGHI FRANCESCO"
+  Assets:IT:BPS:Checking  -327.47 EUR
+  Expenses:IT:Taxes:Unico
+
+2018-09-18 * "VOSTRA DISPOSIZIONE | PAGAMENTO PREMIO ASSICURATIVO PRODOTTO: 888 - INVESTIDOC FREE 2% PIANO RISPPOLIZZA: 00000000721532"
+  Assets:IT:BPS:Checking  -100.00 EUR
+  Expenses:IT:Bank:Insurance
+
+2018-09-19 * "ADDEBITI PREAUTORIZZATI SDD-UTENZE | SDD 0621770447 WIND-TRE ID MANDATO:O66791P1080996584 236454666 107401933 276533291 W1814399043 581TIPO:CORE-RCUR"
+  Assets:IT:BPS:Checking  -65.04 EUR
+  Expenses:Home:Phonternet
+
+2018-09-19 * "COMMISSIONI ADDEBITI PREAUTORIZZATI SDD | Addebito Preautorizzato SDD N. 0621770447"
+  Assets:IT:BPS:Checking  -0.60 EUR
+  Expenses:IT:Bank:Fees
+
+*** October
+2018-10-01 * "ADDEBITI PREAUTORIZZATI SDD-COMMERCIALE | SDD 0621870460 AGOS DUCATO SPA ID MANDATO:3128740100000058994160 PR. 58994160/003/01 01/10/18 TIPO:CORE-RCUR"
+  Assets:IT:BPS:Checking  -418.17 EUR
+  Expenses:Personal:Leisure
+
+2018-10-01 * "COMMISSIONI ADDEBITI PREAUTORIZZATI SDD | Addebito Preautorizzato SDD N. 0621870460"
+  Assets:IT:BPS:Checking  -1.00 EUR
+  Expenses:IT:Bank:Fees
+
+2018-10-01 * "PAGAMENTI DIVERSI | Pagamento utenze 097100295619131211 ENEL ENERGIA SPA"
+  Assets:IT:BPS:Checking  -119.79 EUR
+  Expenses:Home:Electricity
+
+2018-10-01 * "ORDINE E CONTO | ORD. GELATERIA ARTIGIANA DI FALAHA TAREK AFFITTO SETTEMBRE 2018 Rif. EA18092849702369481090010900IT"
+  Assets:IT:BPS:Checking  782.00 EUR
+  Income:Rent:Falaha  -750.00 EUR
+  Income:Rent:Canturina:Expenses  -30.00 EUR
+  Income:Rent:Taxes:Reimbursement
+
+2018-09-30 * "COMPETENZE - ONERI, COMMISSIONI E SPESE | Liquidazione al 30/09/2018 c/c 066/0011383"
+  Assets:IT:BPS:Checking  -18.00 EUR
+  Expenses:IT:Bank:Fees
+
+2018-09-30 * "RECUPERO IMPOSTA DI BOLLO | Periodo dal 01/07/2018 al 30/09/2018 Conto Corrente n. 066/0011383"
+  Assets:IT:BPS:Checking  -8.55 EUR
+  Expenses:IT:Bank:Taxes
+
+2018-10-03 * "ADDEBITI PREAUTORIZZATI SDD-COMMERCIALE | SDD 0622053917 TELEPASS PAY ID MANDATO:B6H6Q40000000190497465 DOC. 022093413 DEL 300918 TIPO:CORE-RCUR"
+  Assets:IT:BPS:Checking  -16.88 EUR
+  Expenses:Transport:Toll
+
+2018-10-03 * "COMMISSIONI ADDEBITI PREAUTORIZZATI SDD | Addebito Preautorizzato SDD N. 0622053917"
+  Assets:IT:BPS:Checking  -1.00 EUR
+  Expenses:IT:Bank:Fees
+
+2018-10-08 * "COMMISSIONI | Disposizione bonifico SCT Rif. VTP18281T0028474481090210900IT"
+  Assets:IT:BPS:Checking  -1.50 EUR
+  Expenses:IT:Bank:Fees
+
+2018-10-08 * "VOSTRA DISPOSIZIONE | Disposizione bonifico SCT Fv. LONGHI CAMILLO RIMBORSO F24 INPS Rif. VTP18281T0028474481090210900IT"
+  Assets:IT:BPS:Checking  -1818.49 EUR
+  Expenses:LonghiCostruzioni
+
+2018-09-30 * "RECUPERO IMPOSTA DI BOLLO | Imposta sostitutiva di bollo su deposito titoli 066/498411"
+  Assets:IT:BPS:Checking  -1.20 EUR
+  Expenses:IT:Bank:Taxes
+
+2018-10-12 * "PAGAMENTO BOLLETTINO MAV | Pagamento MAV MAV Nr. 03069086179426904"
+  Assets:IT:BPS:Checking  -37.44 EUR
+  Expenses:Personal:Leisure ;veterinario x osservazione Agostino
+
+2018-10-15 * "ADDEBITO NEXI | POSIZIONE N. 0116300"
+  Assets:IT:BPS:Checking  -326.24 EUR
+  Liabilities:IT:Visa
+
+2018-10-15 * "ADDEBITI PREAUTORIZZATI SDD-FIDATY ORO | SDD 0525778794 FIDATI S.p.A. ID MANDATO:I650840000002335697A01 ADDEB.FIDATY ORO 8713811-2018-09 SDD 60170090TIPO:CORE-RCUR"
+  Assets:IT:BPS:Checking  -341.30 EUR
+  Expenses:Food:Groceries
+
+2018-10-15 * "BONIFICO SOGGETTO A RITENUTA D'ACCONTO | ORD. GRIMAUDO ROSARIO DELLA VALLE ALESSANDRA PAG. FT. NUMERO 06/18 DEL 11/10/2018 SALDO PRESTAZIONI TECNICHE RECUPERO SOTTOTETTO DETRAZRif. EA18101257454821ZX1090010900IT"
+  Assets:IT:BPS:Checking  778.38 EUR
+  Income:Work
+
+2018-10-16 * "ORDINE E CONTO | ORD. P.E. PRIME EQUIPE S.R.L Fv. LONGHI FRANCESCO SALDO RICEVUTA AFFITTO N. 767 DEL 15/10/2018 Rif. 0306929592871100481091010910IT"
+  Assets:IT:BPS:Checking  680.00 EUR
+  Income:Rent:PrimeEquipe  -650.00 EUR
+  Income:Rent:Canturina:Expenses
+
+2018-10-16 * "VOSTRA DISPOSIZIONE | PAGAMENTO PREMIO ASSICURATIVO PRODOTTO: 888 - INVESTIDOC FREE 2% PIANO RISPPOLIZZA: 00000000721532"
+  Assets:IT:BPS:Checking  -100.00 EUR
+  Expenses:IT:Bank:Insurance
+
+2018-10-16 * "PAGAMENTO TRIBUTI VARI | CODICE FISCALE: LNGFNC66H13C933I 16/10/2018 LONGHI FRANCESCO"
+  Assets:IT:BPS:Checking  -1442.21 EUR
+  Expenses:IT:Taxes:Unico
+
+2018-10-16 * "PAGAMENTO TRIBUTI VARI | CODICE FISCALE: LNGFNC66H13C933I 16/10/2018 LONGHI FRANCESCO"
+  Assets:IT:BPS:Checking  -328.54 EUR
+  Expenses:IT:Taxes:Unico
+
+2018-10-17 * "ADDEBITI PREAUTORIZZATI SDD-COMMERCIALE | SDD 0622341713 FONDAZIONE MINOPRIOVIALE RAIMOID MANDATO:E126840000000000006189 FT.N.0000000521 DEL 29/09/2018 TIPO:CORE-RCUR"
+  Assets:IT:BPS:Checking  -1460.00 EUR
+  Expenses:Family:Children
+
+2018-10-17 * "COMMISSIONI ADDEBITI PREAUTORIZZATI SDD | Addebito Preautorizzato SDD N. 0622341713"
+  Assets:IT:BPS:Checking  -1.00 EUR
+  Expenses:IT:Bank:Fees
+
+2018-10-19 * "ORDINE E CONTO | ORD. MABA S.R.L. SALDO AFFITTO OTTOBRE Rif. 0843000983457611485129001600IT"
+  Assets:IT:BPS:Checking  491.16 EUR
+  Income:Rent:Maba  -459.16 EUR
+  Income:Rent:Canturina:Expenses  -30.00 EUR
+  Income:Rent:Taxes:Reimbursement
+
+2018-10-22 * "COMMISSIONI | Disposizione bonifico SCT Rif. VTP18295T0051209481090210900IT"
+  Assets:IT:BPS:Checking  -5.20 EUR
+  Expenses:IT:Bank:Fees
+
+2018-10-22 * "VOSTRA DISPOSIZIONE | Disposizione bonifico SCT Fv. GUARISCO GIANNINA RIMBORSO IMPOSTA SOSTITUTIVA ALBATRE Rif. VTP18295T0051209481090210900IT"
+  Assets:IT:BPS:Checking  -10647.00 EUR
+  Expenses:IT:Taxes:Property ;imposta sostitutiva - sanzioni ed interessi
+
+2018-10-23 * "PAGAMENTI DIVERSI | Pagamento utenze 097100296064108008 ENEL ENERGIA SPA"
+  Assets:IT:BPS:Checking  -54.73 EUR
+  Expenses:Canturina:Electricity
+
+2018-10-23 * "PAGAMENTI DIVERSI | Pagamento utenze 097100296064108109 ENEL ENERGIA SPA"
+  Assets:IT:BPS:Checking  -54.38 EUR
+  Expenses:Albatre:Electricity
+
+2018-10-28 * "RICARICA TELEFONICA | Pagamento Ricarica Telefonica Scrigno Operazione del 28/10/2018 alle 15:58 Ricarica WIND"
+  Assets:IT:BPS:Checking  -15.00 EUR
+  Expenses:Family:Children
+
+2018-10-29 * "PAGAMENTO BOLLETTINO MAV | Pagamento MAV MAV Nr. 05696236235363249"
+  Assets:IT:BPS:Checking  -510.34 EUR
+  Expenses:Work:Retirement
+
+2018-10-30 * "ORDINE E CONTO | ORD. GELATERIA ARTIGIANA DI FALAHA TAREK AFFITTO OTTOBRE 2018 Rif. EA18102764505808481090010900IT"
+  Assets:IT:BPS:Checking  782.00 EUR
+  Income:Rent:Falaha  -750.00 EUR
+  Income:Rent:Canturina:Expenses  -30.00 EUR
+  Income:Rent:Taxes:Reimbursement
+
+2018-10-31 * "PAGAMENTO RATA FINANZIAMENTO | MUTUO IPOTECARIO PAGAMENTO RATA 00065/01046487 INTESTATO A: LONGHI FRANCESCO TARBINI PAOLA"
+  Assets:IT:BPS:Checking  -2985.85 EUR
+  Liabilities:IT:Mortgage
+
+*** November
+2018-11-02 * "ADDEBITI PREAUTORIZZATI SDD-COMMERCIALE | SDD 0622536211 AGOS DUCATO SPA ID MANDATO:3128740100000058994160 PR. 58994160/004/01 01/11/18 TIPO:CORE-RCUR"
+  Assets:IT:BPS:Checking  -418.17 EUR ;Honda
+  Expenses:Personal:Leisure
+
+2018-11-02 * "COMMISSIONI ADDEBITI PREAUTORIZZATI SDD | Addebito Preautorizzato SDD N. 0622536211"
+  Assets:IT:BPS:Checking  -1.00 EUR
+  Expenses:IT:Bank:Fees
+
+2018-11-08 * "VERS. ASS. BANCARI ALTRE BANCHE | "
+  Assets:IT:BPS:Checking  882.17 EUR
+  Income:Rent:Milli  -770.00 EUR
+  Income:Rent:Canturina:Expenses  -60.00 EUR
+  Income:Rent:Canturina:Electricity  -17.40 EUR
+  Income:Rent:Canturina:Water  -34.77 EUR
+
+2018-11-09 * "ORDINE E CONTO | ORD. MABA S.R.L. SALDO AFFITTO novembre Rif. 0843000989773503485129001600IT"
+  Assets:IT:BPS:Checking  491.16 EUR
+  Income:Rent:Maba  -459.16 EUR
+  Income:Rent:Canturina:Expenses  -30.00 EUR
+  Income:Rent:Taxes:Reimbursement
+
+2018-11-09 * "PAGAMENTO TRIBUTI VARI | CODICE FISCALE: LNGFNC66H13C933I 09/11/2018 LONGHI FRANCESCO"
+  Assets:IT:BPS:Checking  -180.00 EUR ;imposta registro Falaha
+  Expenses:IT:Taxes:Property
+
+2018-11-15 * "ADDEBITO NEXI | POSIZIONE N. 0116300"
+  Assets:IT:BPS:Checking  -215.04 EUR
+  Liabilities:IT:Visa
+
+2018-11-15 * "ADDEBITI PREAUTORIZZATI SDD-FIDATY ORO | SDD 0526604836 FIDATI S.p.A. ID MANDATO:I650840000002335697A01 ADDEB.FIDATY ORO 8848037-2018-10 SDD 60170090TIPO:CORE-RCUR"
+  Assets:IT:BPS:Checking  -565.65 EUR
+  Expenses:Food:Groceries
+
+2018-11-16 * "ORDINE E CONTO | ORD. P.E. PRIME EQUIPE S.R.L Fv. LONGHI FRANCESCO SALDO RICEVUTA DI AFFITTO NR. 775 DEL 15/11/1Rif. 0306926616371802481091010910IT"
+  Assets:IT:BPS:Checking  680.00 EUR
+  Income:Rent:PrimeEquipe  -650.00 EUR
+  Income:Rent:Canturina:Expenses
+
+2018-11-16 * "VOSTRA DISPOSIZIONE | PAGAMENTO PREMIO ASSICURATIVO PRODOTTO: 888 - INVESTIDOC FREE 2% PIANO RISPPOLIZZA: 00000000721532"
+  Assets:IT:BPS:Checking  -100.00 EUR
+  Expenses:IT:Bank:Insurance
+
+2018-11-19 * "ADDEBITI PREAUTORIZZATI SDD-UTENZE | SDD 0622926384 WIND-TRE ID MANDATO:O66791P1080996584 241594451 110553167 283787993 W1817860775 599TIPO:CORE-RCUR"
+  Assets:IT:BPS:Checking  -64.86 EUR
+  Expenses:Home:Phonternet
+
+2018-11-19 * "COMMISSIONI ADDEBITI PREAUTORIZZATI SDD | Addebito Preautorizzato SDD N. 0622926384"
+  Assets:IT:BPS:Checking  -0.60 EUR
+  Expenses:IT:Bank:Fees
+
+2018-11-19 * "PAGAMENTO TRIBUTI VARI | CODICE FISCALE: LNGFNC66H13C933I 19/11/2018 LONGHI FRANCESCO"
+  Assets:IT:BPS:Checking  -212.00 EUR
+  Expenses:Home:Garbage
+
+2018-11-23 * "VERS. ASS. BANCARI ALTRE BANCHE | ROBBIANI - MEZZANZANICA - BIANCO - POLO NORD 1509,22"
+  Assets:IT:BPS:Checking  8136.55 EUR
+  Income:Rent:Robbiani  -2400.00 EUR
+  Income:Rent:Canturina:Expenses  -120.00 EUR
+  Income:Rent:Canturina:Water  -99.03 EUR
+  Income:Rent:Canturina:Electricity  -31.80 EUR
+  Income:Rent:Mezzanzanica  -1440.00 EUR
+  Income:Rent:Canturina:Expenses  -120.00 EUR
+  Income:Rent:Canturina:Electricity  -31.80 EUR
+  Income:Rent:Canturina:Water  -66.02 EUR
+  Income:Rent:IlBoschetto  -2197.69 EUR
+  Income:Rent:Canturina:Electricity  -17.40 EUR
+  Income:Rent:Canturina:Expenses  -90.00 EUR
+  Income:Rent:Canturina:Water  -11.59 EUR
+  Income:Rent:Taxes:Reimbursement  -2.00 EUR
+  Income:Rent:Ballerini  -1340.91 EUR
+  Income:Rent:Ballerini  19.14 EUR ;non versati da addebitare
+  Income:Rent:Canturina:Electricity  -38.94 EUR
+  Income:Rent:Canturina:Expenses  -60.00 EUR
+  Income:Rent:Canturina:Water  -33.01 EUR
+  Income:Rent:Taxes:Reimbursement  -53.50 EUR ;registro
+  Income:Rent:Taxes:Reimbursement  -2.00 EUR
+
+2018-11-22 * "COMMISSIONI | Disposizione bonifico SCT Rif. VTP18326T0025844481090210900IT"
+  Assets:IT:BPS:Checking  -1.50 EUR
+  Expenses:IT:Bank:Fees
+
+2018-11-22 * "VOSTRA DISPOSIZIONE | Disposizione bonifico SCT Fv. CEREDA FABRIZIO BROKER POLIZZA 163698288 Rif. VTP18326T0025844481090210900IT"
+  Assets:IT:BPS:Checking  -250.00 EUR ;capofamiglia
+  Expenses:Property:Insurance
+
+2018-11-23 * "COMMISSIONI | Disposizione bonifico SCT Rif. VTP18327T0012078481090210900IT"
+  Assets:IT:BPS:Checking  -52.50 EUR ;costo bonifico estero
+  Expenses:IT:Bank:Fees
+
+2018-11-23 * "VOSTRA DISPOSIZIONE | Disposizione bonifico SCT Fv. FRANCESCO LONGHI PER CHIUSURA CC - CHIUSURA FIDEJUSSIONE Rif. VTP18327T0012078481090210900IT"
+  Assets:IT:BPS:Checking  -22500.00 EUR ;saldo per chiusura
+  Assets:CH:BPSSuisse:Checking
+
+2018-11-26 * "PAGAMENTI DIVERSI | Pagamento utenze 097100296811713168 ENEL ENERGIA SPA"
+  Assets:IT:BPS:Checking  -125.84 EUR
+  Expenses:Home:Electricity
+
+2018-11-27 * "RICARICA TELEFONICA | Pagamento Ricarica Telefonica Scrigno Operazione del 27/11/2018 alle 09:01 Ricarica WIND"
+  Assets:IT:BPS:Checking  -30.00 EUR
+  Expenses:Home:Phonternet
+
+2018-11-30 * "PAGAMENTO TRIBUTI VARI | CODICE FISCALE: LNGFNC66H13C933I 30/11/2018 LONGHI FRANCESCO"
+  Assets:IT:BPS:Checking  -7862.38 EUR
+  Expenses:IT:Taxes:Unico
+
+2018-11-30 * "PAGAMENTO TRIBUTI VARI | CODICE FISCALE: TRBPLA67E52C933U 30/11/2018"
+  Assets:IT:BPS:Checking  -85.35 EUR
+  Expenses:IT:Taxes:Unico
+
+*** December  
+2018-12-03 * "ADDEBITI PREAUTORIZZATI SDD-COMMERCIALE | SDD 0623079605 AGOS DUCATO SPA ID MANDATO:3128740100000058994160 PR. 58994160/005/01 01/12/18 TIPO:CORE-RCUR"
+  Assets:IT:BPS:Checking  -418.17 EUR
+  Expenses:Personal:Leisure
+
+2018-12-03 * "COMMISSIONI ADDEBITI PREAUTORIZZATI SDD | Addebito Preautorizzato SDD N. 0623079605"
+  Assets:IT:BPS:Checking  -1.00 EUR
+  Expenses:IT:Bank:Fees
+
+2018-12-03 * "COMMISSIONI | Disposizione bonifico SCT Rif. VTP18337T0012565481090210900IT"
+  Assets:IT:BPS:Checking  -1.50 EUR
+  Expenses:IT:Bank:Fees
+
+2018-12-03 * "VOSTRA DISPOSIZIONE | Disposizione bonifico SCT Fv. FONDAZIONE ORDINE DEGLI INGEGNERI DI COMOSEMINARIO BLOCKCHAIN Rif. VTP18337T0012565481090210900IT"
+  Assets:IT:BPS:Checking  -48.80 EUR
+  Expenses:Work:Courses
+
+2018-12-04 * "ORDINE E CONTO | ORD. TECNOAMBIENTE SRL NOTA INFORMATIVA TCMB.18.059 Rif. 0311115172533710481110053940IT"
+  Assets:IT:BPS:Checking  1560.00 EUR
+  Income:Work
+
+2018-12-07 * "ORDINE E CONTO | ORD. MABA S.R.L. SALDO AFFITTO dicembre Rif. 0843000996900406485129001600IT"
+  Assets:IT:BPS:Checking  491.16 EUR
+  Income:Rent:Maba  -459.16 EUR
+  Income:Rent:Canturina:Expenses  -30.00 EUR
+  Income:Rent:Taxes:Reimbursement
+
+2018-12-12 * "COMMISSIONI | Disposizione bonifico SCT Rif. VTP18346T0054025481090210900IT"
+  Assets:IT:BPS:Checking  -1.50 EUR
+  Expenses:IT:Bank:Fees
+
+2018-12-12 * "COMMISSIONI | Disposizione bonifico SCT Rif. VTP18346T0053847481090210900IT"
+  Assets:IT:BPS:Checking  -1.50 EUR
+  Expenses:IT:Bank:Fees
+
+2018-12-12 * "VOSTRA DISPOSIZIONE | Disposizione bonifico SCT Fv. MAST SNC POLIZZA 15WX013I Rif. VTP18346T0053847481090210900IT"
+  Assets:IT:BPS:Checking  -513.00 EUR
+  Expenses:Transport:InsuranceAndFees
+
+2018-12-12 * "VOSTRA DISPOSIZIONE | Disposizione bonifico SCT Fv. MAST SNC POLIZZA 164994535 Rif. VTP18346T0054025481090210900IT"
+  Assets:IT:BPS:Checking  -971.00 EUR
+  Expenses:Property:Insurance
+
+2018-12-17 * "ADDEBITO NEXI | POSIZIONE N. 0116300"
+  Assets:IT:BPS:Checking  -704.17 EUR
+  Liabilities:IT:Visa
+
+2018-12-17 * "ADDEBITI PREAUTORIZZATI SDD-FIDATY ORO | SDD 0527171527 FIDATI S.p.A. ID MANDATO:I650840000002335697A01 ADDEB.FIDATY ORO 8993211-2018-11 SDD 60170090TIPO:CORE-RCUR"
+  Assets:IT:BPS:Checking  -283.00 EUR
+  Expenses:Food:Groceries
+
+2018-12-17 * "ORDINE E CONTO | ORD. P.E. PRIME EQUIPE S.R.L Fv. LONGHI FRANCESCO SALDO RICEVUTA AFFITTO NR. 783 DEL15/12/18 Rif. 0306927738433507481091010910IT"
+  Assets:IT:BPS:Checking  680.00 EUR
+  Income:Rent:PrimeEquipe  -650.00 EUR
+  Income:Rent:Canturina:Expenses
+
+2018-12-17 * "PAGAMENTO TRIBUTI VARI | CODICE FISCALE: LNGFNC66H13C933I 17/12/2018 LONGHI FRANCESCO"
+  Assets:IT:BPS:Checking  -7017.00 EUR ;Imu saldo
+  Expenses:IT:Taxes:Property
+
+2018-12-17 * "PAGAMENTO TRIBUTI VARI | CODICE FISCALE: TRBPLA67E52C933U 17/12/2018 TARBINI PAOLA"
+  Assets:IT:BPS:Checking  -110.00 EUR ;Imu saldo
+  Expenses:IT:Taxes:Property
+
+2018-12-18 * "VOSTRA DISPOSIZIONE | PAGAMENTO PREMIO ASSICURATIVO PRODOTTO: 888 - INVESTIDOC FREE 2% PIANO RISPPOLIZZA: 00000000721532"
+  Assets:IT:BPS:Checking  -100.00 EUR
+  Expenses:IT:Bank:Insurance
+
+2018-12-20 * "PAGAMENTI DIVERSI | Pagamento utenze 200500304386663492 ENERXENIA S.P.A."
+  Assets:IT:BPS:Checking  -223.41 EUR
+  Expenses:Home:Gas
+
+2018-12-20 * "VERSAMENTO CONTANTI | TARABBIA"
+  Assets:IT:BPS:Checking  500.00 EUR ;non è tarabbia!
+  Assets:IT:Cash
+
+2018-12-27 * "VERS. ASS. BANCARI ALTRE BANCHE | "
+  Assets:IT:BPS:Checking  219.51 EUR ;Tarabbia spese finali
+  Income:Rent:Canturina:Electricity  -36.50 EUR
+  Income:Rent:Canturina:Expenses  -150.00 EUR ;compreso forfait
+  Income:Rent:Canturina:Water
+
+2018-12-20 * "PAGAMENTI DIVERSI | Pagamento utenze 097100297408588986 ENEL ENERGIA SPA"
+  Assets:IT:BPS:Checking  -58.06 EUR
+  Expenses:Canturina:Electricity
+  
+2018-12-20 * "PAGAMENTI DIVERSI | Pagamento utenze 097100297408589087 ENEL ENERGIA SPA"
+  Assets:IT:BPS:Checking  -56.61 EUR
+  Expenses:Albatre:Electricity
+
+2018-12-27 * "VERSAMENTO CONTANTI | "
+  Assets:IT:BPS:Checking  1500.00 EUR
+  Assets:IT:Cash
+
+2018-12-27 * "PAGAMENTI DIVERSI | Pagamento utenze 200071800545560085 ACSM AGAM SPA"
+  Assets:IT:BPS:Checking  -95.96 EUR
+  Expenses:Home:Water
+
+2018-12-27 * "PAGAMENTI DIVERSI | Pagamento utenze 200071800514770015 ACSM AGAM SPA"
+  Assets:IT:BPS:Checking  -287.27 EUR
+  Expenses:Canturina:Water
+
+2018-12-27 * "PAGAMENTI DIVERSI | Pagamento utenze 200071800497430060 ACSM AGAM SPA"
+  Assets:IT:BPS:Checking  -20.58 EUR
+  Expenses:Colli:Water
+
+2018-12-28 * "PAGAMENTO BOLLETTINO MAV | Pagamento MAV MAV Nr. 05696429644027004"
+  Assets:IT:BPS:Checking  -136.45 EUR ;Inarcassa
+  Expenses:Work:Retirement
+
+2018-12-28 * "ORDINE E CONTO | ORD. GELATERIA ARTIGIANA DI FALAHA TAREK AFFITTO NOVEMBRE 2018 Rif. EA18122798853254481090010900IT"
+  Assets:IT:BPS:Checking  782.00 EUR
+  Income:Rent:Falaha  -750.00 EUR
+  Income:Rent:Canturina:Expenses  -30.00 EUR
+  Income:Rent:Taxes:Reimbursement
+
+2018-12-31 * "ADDEBITI PREAUTORIZZATI SDD-COMMERCIALE | SDD 0623716711 TELEPASS PAY ID MANDATO:B6H6Q40000000190497465 DOC. 031140840 DEL 311218 TIPO:CORE-RCUR"
+  Assets:IT:BPS:Checking  -3.78 EUR
+  Expenses:Transport:Toll
+
+2018-12-31 * "COMMISSIONI ADDEBITI PREAUTORIZZATI SDD | Addebito Preautorizzato SDD N. 0623716711"
+  Assets:IT:BPS:Checking  -1.00 EUR
+  Expenses:IT:Bank:Fees
+
+** Visa
+*** January
+2018-01-08 * "Tab S2"
+  Expenses:Family:Children  347.71 EUR ;Abramo 330.00 rimborsate
+  Liabilities:IT:Visa
+
+2018-01-15 * "nespresso"
+  Expenses:Personal:Leisure  77.60 EUR
+  Liabilities:IT:Visa
+
+2018-01-15 * "rate telefono"
+  Expenses:Personal:Leisure  12.00 EUR
+  Liabilities:IT:Visa
+
+2018-01-15 * "stereo mamma"
+  Expenses:Personal:Leisure  117.99 EUR ;rimborsato 119.00
+  Liabilities:IT:Visa
+
+2018-01-19 * "piscina corso"
+  Expenses:Family:Children  315.00 EUR
+  Liabilities:IT:Visa
+
+2018-01-25 * "custodie phablet"
+  Expenses:Family:Children  9.90 EUR ;Abramo
+  Expenses:Family:Paola  11.99 EUR ;Paola
+  Expenses:Home:Maintenance  7.43 ;pulitore adesivi
+  Liabilities:IT:Visa
+
+2018-01-26 * "custodia"
+  Expenses:Family:Children  10.95 EUR ;Marghe
+  Liabilities:IT:Visa
+
+2018-01-27 * "custodia S7"
+  Expenses:Personal:Leisure  13.99 EUR
+  Liabilities:IT:Visa
+
+2018-01-28 * "downloads"
+  Expenses:Personal:Leisure  3.98 EUR
+  Liabilities:IT:Visa
+
+*** February
+2018-02-13 * "ALTRE SPESE | AMAZON MKTPLCE EU-IT 800-279-6620"
+  Liabilities:IT:Visa  -61.41 EUR
+  Expenses:Personal:Leisure
+
+2018-02-12 * "SERVIZI TELEFONICI | WIND CORPORATE RHO"
+  Liabilities:IT:Visa  -12.00 EUR
+  Expenses:Personal:Leisure
+
+2018-02-11 * "ALTRE SPESE | AMAZON MKTPLCE EU-IT 800-279-6620"
+  Liabilities:IT:Visa  -41.13 EUR
+  Expenses:Personal:Leisure
+
+2018-02-05 * "ALTRE SPESE | AMAZON DIGITAL DWNLDS 866-321-8851"
+  Liabilities:IT:Visa  -4.99 EUR
+  Expenses:Personal:Leisure
+
+*** March
+2018-03-21 * "ABBIGLIAMENTO | DECATHLON 00000733    919"
+  Liabilities:IT:Visa  -82.05 EUR
+  Expenses:Family:Children
+
+2018-03-14 * "SUPERMERCATI | www.nespresso.it"
+  Liabilities:IT:Visa  -136.00 EUR
+  Expenses:Personal:Leisure
+
+2018-03-12 * "SERVIZI TELEFONICI | WIND CORPORATE"
+  Liabilities:IT:Visa  -12.00 EUR
+  Expenses:Personal:Leisure
+*** April
+2018-04-20 * "ALTRE SPESE | Amazon *Mktplce EU-IT"
+  Liabilities:IT:Visa  -15.00 EUR
+  Expenses:Personal:Leisure
+
+2018-04-12 * "ALTRE SPESE | Amazon Digital Dwnlds"
+  Liabilities:IT:Visa  -2.99 EUR
+  Expenses:Personal:Leisure
+
+2018-04-10 * "ALTRE SPESE | Amazon.it Retail"
+  Liabilities:IT:Visa  -56.90 EUR
+  Expenses:Personal:Leisure
+
+2018-04-09 * "SERVIZI TELEFONICI | WIND CORPORATE"
+  Liabilities:IT:Visa  -12.00 EUR
+  Expenses:Personal:Leisure
+
+2018-04-09 * "ALTRE SPESE | Amazon.it Retail"
+  Liabilities:IT:Visa  -10.20 EUR
+  Expenses:Personal:Leisure
+
+2018-04-05 * "ALTRE SPESE | APPLE ONLINE STORE EUR"
+  Liabilities:IT:Visa  -35.00 EUR
+  Expenses:Personal:Leisure
+
+2018-04-04 * "ALTRE SPESE | Amazon *Mktplce EU-IT"
+  Liabilities:IT:Visa
+  Expenses:Personal:Leisure  15.57 EUR
+
+2018-04-03 * "ALTRE SPESE | Amazon *Mktplce EU-IT"
+  Liabilities:IT:Visa  -42.74 EUR
+  Expenses:Personal:Leisure
+
+*** May
+2018-05-29 * "SUPERMERCATI | ALDI S.R.L."
+  Liabilities:IT:Visa  -39.22 EUR
+  Expenses:Food:Groceries
+
+2018-05-23 * "ALTRE SPESE | Amazon Digital Dwnlds"
+  Liabilities:IT:Visa  -1.59 EUR
+  Expenses:Personal:Leisure
+
+2018-05-16 * "ALTRE SPESE | Amazon.it Retail"
+  Liabilities:IT:Visa  -15.01 EUR
+  Expenses:Personal:Leisure
+
+2018-05-16 * "ALTRE SPESE | Amazon *Mktplce EU-IT"
+  Liabilities:IT:Visa  -31.93 EUR
+  Expenses:Personal:Leisure
+
+2018-05-15 * "ALTRE SPESE | LOGICAL SOFT"
+  Liabilities:IT:Visa  -68.32 EUR
+  Expenses:Work:Office
+
+2018-05-14 * "SERVIZI TELEFONICI | WIND CORPORATE"
+  Liabilities:IT:Visa  -12.00 EUR
+  Expenses:Personal:Leisure
+
+2018-05-11 * "ALTRE SPESE | Amazon *Mktplce EU-IT"
+  Liabilities:IT:Visa  -49.99 EUR
+  Expenses:Personal:Leisure
+  
+*** June
+2018-06-15 * "00663321497 ALTRE SPESE | Amazon *Mktplce EU-IT"
+  Liabilities:IT:Visa  21.85 EUR
+  Expenses:Personal:Leisure
+
+2018-06-12 * "00476385422 ABBIGLIAMENTO | DECATHLON 00000733    919"
+  Liabilities:IT:Visa  198.52 EUR
+  Expenses:Personal:Leisure
+
+2018-06-12 * "00790952209 ALTRE SPESE | Amazon Digital Dwnlds"
+  Liabilities:IT:Visa  1.99 EUR
+  Expenses:Personal:Leisure
+
+2018-06-11 * "00283857072 ALTRE SPESE | Amazon *Mktplce EU-IT"
+  Liabilities:IT:Visa  1.57 EUR
+  Expenses:Personal:Leisure
+
+2018-06-11 * "00364731154 ALTRE SPESE | Amazon.it Prime"
+  Liabilities:IT:Visa  36.00 EUR
+  Expenses:Personal:Leisure
+
+2018-06-11 * "16320663131 SERVIZI TELEFONICI | WIND CORPORATE"
+  Liabilities:IT:Visa  12.00 EUR
+  Expenses:Personal:Leisure
+
+2018-06-11 * "00369771809 ALTRE SPESE | Amazon *Mktplce EU-IT"
+  Liabilities:IT:Visa  12.45 EUR
+  Expenses:Personal:Leisure
+
+2018-06-10 * "00048737230 ALTRE SPESE | Amazon *Mktplce EU-IT"
+  Liabilities:IT:Visa  7.99 EUR
+  Expenses:Personal:Leisure
+
+2018-06-07 * "00386810982 ALTRE SPESE | Amazon *Mktplce EU-IT"
+  Liabilities:IT:Visa  26.95 EUR
+  Expenses:Personal:Leisure
+
+2018-06-07 * "00518174612 ALTRE SPESE | Amazon.it Retail"
+  Liabilities:IT:Visa  75.65 EUR
+  Expenses:Personal:Leisure
+
+*** July
+2018-07-09 * "27359283957 ALTRE SPESE | PAYPAL *WWW.IKEA.IT"
+  Liabilities:IT:Visa  1169.92 EUR
+  Expenses:Family:Children
+
+2018-07-09 * "19120765110 SERVIZI TELEFONICI | WIND CORPORATE"
+  Liabilities:IT:Visa  12.00 EUR
+  Expenses:Personal:Leisure
+
+2018-07-06 * "00708311631 ALTRE SPESE | Amazon *Mktplce EU-IT"
+  Liabilities:IT:Visa  118.00 EUR
+  Expenses:Personal:Leisure
+
+*** August
+2018-08-21 * "33091343370 ALTRE SPESE | PAYPAL *AMPHIBIOUSS"
+  Liabilities:IT:Visa  52.00 EUR
+  Expenses:Personal:Leisure
+
+2018-08-21 * "00208151762 ALTRE SPESE | Kindle Svcs"
+  Liabilities:IT:Visa  1.99 EUR
+  Expenses:Personal:Leisure
+
+2018-08-13 * "22621089435 SERVIZI TELEFONICI | WIND CORPORATE"
+  Liabilities:IT:Visa  12.00 EUR
+  Expenses:Personal:Leisure
+
+2018-08-12 * "00376403335 ALTRE SPESE | AMZN Mktp IT"
+  Liabilities:IT:Visa  226.48 EUR
+  Expenses:Family:Children ;Tablet Ulisse?
+
+2018-08-10 * "00442138057 ALTRE SPESE | AMZN Mktp IT"
+  Liabilities:IT:Visa  69.74 EUR
+  Expenses:Personal:Leisure
+
+2018-08-10 * "31106037334 ALTRE SPESE | AMAZON.IT WWW.AMAZON.IT"
+  Liabilities:IT:Visa  21.28 EUR
+  Expenses:Personal:Leisure
+
+2018-08-09 * "00834273299 ALTRE SPESE | Amazon Digital Dwnlds"
+  Liabilities:IT:Visa  2.99 EUR
+  Expenses:Personal:Leisure
+
+2018-08-09 * "31102625264 ALTRE SPESE | AMAZON.IT WWW.AMAZON.IT"
+  Liabilities:IT:Visa  38.86 EUR
+  Expenses:Personal:Leisure
+
+2018-08-03 * "80315812761 SUPERMERCATI | Aldi Suisse 59"
+  Liabilities:IT:Visa  78.12 EUR
+  Expenses:Food:Groceries
+
+*** September
+2018-09-18 * "00786393815 ALTRE SPESE | AMZN Mktp IT"
+  Liabilities:IT:Visa  15.89 EUR
+  Expenses:Personal:Leisure
+
+2018-09-18 * "37729217183 ABBIGLIAMENTO | PAYPAL *MORANDELLIL"
+  Liabilities:IT:Visa  126.21 EUR
+  Expenses:Personal:Leisure
+
+2018-09-17 * "00451272048 ALTRE SPESE | AMZN Mktp IT"
+  Liabilities:IT:Visa  126.54 EUR
+  Expenses:Family:Children  -100.00 ;regalo Ulisse
+  Expenses:Personal:Leisure
+
+2018-09-12 * "36657515235 ALTRE SPESE | PAYPAL *ARUBA SPA"
+  Liabilities:IT:Visa  6.10 EUR
+  Expenses:Postal
+
+2018-09-11 * "25520379074 SERVIZI TELEFONICI | WIND CORPORATE"
+  Liabilities:IT:Visa  12.00 EUR
+  Expenses:Personal:Leisure
+
+2018-09-05 * "04429499461 ALTRE SPESE | 81809010020 MUST BY BEST"
+  Liabilities:IT:Visa  37.50 EUR
+  Expenses:Personal:Leisure
+
+*** October
+2018-10-23 * "00537090057 ALTRE SPESE | AMZN Mktp IT*MT5PX60C4"
+  Liabilities:IT:Visa  9.99 EUR
+  Expenses:Personal:Leisure
+
+2018-10-21 * "00329441684 ALTRE SPESE | Amazon.it*MT96H1A34"
+  Liabilities:IT:Visa  9.40 EUR
+  Expenses:Food:Groceries
+
+2018-10-20 * "00791786666 ALTRE SPESE | AMZN Mktp IT*MT3R01JU4"
+  Liabilities:IT:Visa  12.74 EUR
+  Expenses:Personal:Leisure
+
+2018-10-18 * "00594292104 ALTRE SPESE | AMZN Mktp IT*MT3MY3N64"
+  Liabilities:IT:Visa  5.47 EUR
+  Expenses:Personal:Leisure
+
+2018-10-17 * "00363596819 ALTRE SPESE | AMZN Mktp IT*MT1X46L94"
+  Liabilities:IT:Visa  13.99 EUR
+  Expenses:Personal:Leisure
+
+2018-10-15 * "28921769356 SERVIZI TELEFONICI | WIND CORPORATE"
+  Liabilities:IT:Visa  12.00 EUR
+  Expenses:Personal:Leisure
+
+2018-10-09 * "00749625233 ALTRE SPESE | AMZN Mktp IT"
+  Liabilities:IT:Visa  33.42 EUR
+  Expenses:Personal:Leisure
+
+2018-10-08 * "40997242160 ALTRE SPESE | PAYPAL *MAIAC SNC"
+  Liabilities:IT:Visa  45.20 EUR
+  Expenses:Parents
+
+2018-10-06 * "76135211747 SERVIZI TELEFONICI | ILIAD Italia"
+  Liabilities:IT:Visa  17.98 EUR
+  Expenses:Family:Children
+
+2018-10-03 * "00442284708 ALTRE SPESE | Amazon.it"
+  Liabilities:IT:Visa  27.86 EUR
+  Expenses:Family:Children ;cuffie Ulisse
+
+*** November
+2018-11-29 * "52552854013 SERVIZI TELEFONICI | ILIAD Italia"
+  Liabilities:IT:Visa  17.98 EUR
+  Expenses:Family:Paola
+
+2018-11-28 * "00126567909 ALTRE SPESE | Amazon.it*M07W93L34"
+  Liabilities:IT:Visa  17.97 EUR ;Abramo calendario avvento
+  Expenses:Family:Children
+
+2018-11-26 * "00622686031 ALTRE SPESE | Amazon.it*M86HW7RX4"
+  Liabilities:IT:Visa  26.12 EUR
+  Expenses:Family:Children  -12.99 EUR ;Chiavetta Marghe
+  Expenses:Personal:Leisure
+
+2018-11-23 * "00974951368 ALTRE SPESE | AMZN Mktp IT*M86E482P4"
+  Liabilities:IT:Visa  126.08 EUR
+  Expenses:Parents  -41.99 EUR ;lettore DVD
+  Expenses:Family:Children
+
+2018-11-23 * "00213946930 ALTRE SPESE | AMZN Mktp IT*M87GG27S4"
+  Liabilities:IT:Visa  18.98 EUR
+  Expenses:Family:Children
+
+2018-11-22 * "46406076753 ALTRE SPESE | AMAZON.IT*M85DH9D94 WWW.A"
+  Liabilities:IT:Visa  100.00 EUR
+  Expenses:Family:Children
+
+2018-11-19 * "00876003791 ALTRE SPESE | Kindle Svcs*M87XN05V4"
+  Liabilities:IT:Visa  2.99 EUR
+  Expenses:Personal:Leisure
+
+2018-11-19 * "00769633233 ALTRE SPESE | Amazon.it*M817S15G4"
+  Liabilities:IT:Visa  42.98 EUR
+  Expenses:Family:Children
+
+2018-11-19 * "00919036568 ALTRE SPESE | Amazon.it*M82FK8HR4"
+  Liabilities:IT:Visa  102.27 EUR
+  Expenses:Home:Maintenance  -74.25 EUR ;saldatrice
+  Expenses:Personal:Leisure
+  
+2018-11-19 * "00732357803 ALTRE SPESE | Amazon.it*M83I68MA4"
+  Liabilities:IT:Visa  100.00 EUR
+  Expenses:Personal:Leisure  -55.29 EUR
+  Expenses:Family:Children
+
+2018-11-12 * "31721139487 SERVIZI TELEFONICI | WIND CORPORATE"
+  Liabilities:IT:Visa  12.00 EUR
+  Expenses:Personal:Leisure
+
+2018-11-12 * "00653715566 ALTRE SPESE | AMZN Mktp IT*M81A98Z14"
+  Liabilities:IT:Visa  10.99 EUR
+  Expenses:Personal:Leisure
+
+2018-11-11 * "00118282138 ALTRE SPESE | AMZN Mktp IT*M83291FY4"
+  Liabilities:IT:Visa  45.98 EUR
+  Expenses:Personal:Leisure
+
+2018-11-10 * "00744525158 ALTRE SPESE | AMZN Mktp IT*M80LM84W4"
+  Liabilities:IT:Visa  12.88 EUR
+  Expenses:Personal:Leisure
+
+2018-11-08 * "31870987789 SERVIZI TELEFONICI | ILIAD Italia"
+  Liabilities:IT:Visa  7.99 EUR
+  Expenses:Home:Phonternet
+
+2018-11-05 * "28070605065 SERVIZI TELEFONICI | ILIAD Italia"
+  Liabilities:IT:Visa  20.00 EUR
+  Expenses:Home:Phonternet
+
+2018-11-05 * "44396986273 SERVIZI TELEFONICI | PAYPAL *WWW.WIND.IT"
+  Liabilities:IT:Visa  15.00 EUR
+  Expenses:Home:Phonternet
+
+2018-11-05 * "44387804793 ALTRE SPESE | PAYPAL *ARUBA SPA"
+  Liabilities:IT:Visa  21.96 EUR ;firma digitale
+  Expenses:Work:Office
+
+*** December  
+2018-12-28 * "00888357831 ALTRE SPESE | AMZN Mktp IT*M21FX92T4"
+  Liabilities:IT:Visa  15.74 EUR
+  Expenses:Personal:Leisure
+
+2018-12-28 * "00186066456 ALTRE SPESE | AMZN Mktp IT*M27F04KL4"
+  Liabilities:IT:Visa  56.01 EUR
+  Expenses:Family:Children  -19.99 EUR ;Abramo PS4
+  Expenses:Personal:Leisure
+
+2018-12-28 * "51955834551 ALTRE SPESE | PAYPAL *ENNOVATIONS"
+  Liabilities:IT:Visa  114.94 EUR ;Abramo Starfighter
+  Expenses:Family:Children
+
+2018-12-27 * "00692599868 ALTRE SPESE | AMZN Mktp IT*M20F862V4"
+  Liabilities:IT:Visa  38.38 EUR
+  Expenses:Family:Children  -14.39 EUR ;Ulisse scheda SD
+  Expenses:Personal:Leisure
+
+2018-12-21 * "50221026914 ALTRE SPESE | AMAZON.IT*M24HH05N4 WWW.A"
+  Liabilities:IT:Visa  15.30 EUR ;libro per regalo
+  Expenses:Personal:Gifts
+
+2018-12-19 * "09553679177 SUPERMERCATI | CONSORZIO AGR.COMO LECCO"
+  Liabilities:IT:Visa  83.11 EUR
+  Expenses:Food:Groceries
+
+2018-12-19 * "50606151283 ALTRE SPESE | PAYPAL *TARGET SRL"
+  Liabilities:IT:Visa  -14.00 EUR ;rimborso
+  Expenses:Family:Children
+
+2018-12-18 * "50573304212 ALTRE SPESE | PAYPAL *TARGET SRL"
+  Liabilities:IT:Visa  167.30 EUR ;pistola softair
+  Expenses:Family:Children
+
+2018-12-16 * "50130845861 ALTRE SPESE | AMAZON.IT*M28CP5TS4 WWW.A"
+  Liabilities:IT:Visa  25.96 EUR ;Slave I
+  Expenses:Family:Children
+
+2018-12-16 * "00979726864 ALTRE SPESE | AMZN Mktp IT*M23AH3TV4"
+  Liabilities:IT:Visa  5.99 EUR ;dadi Ulisse
+  Expenses:Family:Children
+
+2018-12-12 * "49049888721 ALTRE SPESE | AMAZON.IT*M28OB9C14 WWW.A"
+  Liabilities:IT:Visa  137.80 EUR ;Giacca Abramo
+  Expenses:Family:Children
+
+2018-12-12 * "49263915609 ALTRE SPESE | PAYPAL *TRIBOODIGIT"
+  Liabilities:IT:Visa  46.80 EUR ;regali Niccolò e Filippo
+  Expenses:Personal:Gifts
+
+2018-12-10 * "34520518139 SERVIZI TELEFONICI | WIND CORPORATE"
+  Liabilities:IT:Visa  12.00 EUR
+  Expenses:Personal:Leisure
+
+2018-12-08 * "68964092635 SERVIZI TELEFONICI | ILIAD Italia"
+  Liabilities:IT:Visa  7.99 EUR
+  Expenses:Home:Phonternet
+
+2018-12-07 * "00883838997 ALTRE SPESE | AMZN Mktp IT*M04IR6S74"
+  Liabilities:IT:Visa  19.99 EUR
+  Expenses:Personal:Leisure
+
+2018-12-03 * "48760757011 ALTRE SPESE | PAYPAL *WELLSTORE"
+  Liabilities:IT:Visa  81.80 EUR ;ginocchiera
+  Expenses:Parents
+
+** Transactions
+2018-01-02 * "Coop"
+  Expenses:Food:Groceries  11.55 EUR
+  Assets:IT:Cash
+
+2018-01-01 * "Cinelandia"
+  Expenses:Personal:Leisure  45.00 EUR
+  Assets:IT:Cash
+
+2018-01-03 * "Aldi"
+  Expenses:Food:Groceries  49.20 CHF
+  Assets:CH:Cash
+
+2018-01-03 * "benzina Yaris"
+  Expenses:Family:Paola  20.00 CHF
+  Assets:CH:Cash
+
+2018-01-05 * "Migros"
+  Expenses:Home:Maintenance  22.00 CHF ;lampada led
+  Assets:CH:Cash
+
+2018-01-05 * "ristorante libanese"
+  Expenses:Food:Restaurant  33.00 EUR
+  Assets:IT:Cash
+
+2018-01-04 * "BricoOk"
+  Expenses:Home:Maintenance  8.85 EUR
+  Assets:IT:Cash
+
+2018-01-08 * "rimborso Abramo"
+  Assets:IT:Cash  330.00 EUR
+  Income:Family:Reimbursement
+
+2018-01-09 * "Paola"
+  Expenses:Family:Paola  200.00 EUR
+  Assets:IT:Cash
+
+2018-01-11 * "Milli"
+  Assets:IT:Cash  400.00 EUR ;+50 perchè assegno era sbagliato
+  Income:Rent:Milli
+
+2018-01-11 * "Marcello Feim"
+  Expenses:Property:Maintenance  50.00 EUR ;temporizzatore Albatre
+  Assets:IT:Cash
+
+2018-01-12 * "Bianco"
+  Assets:IT:Cash  950.00 EUR
+  Income:Rent:IlBoschetto
+
+2018-01-15 * "Ciceri"
+  Assets:IT:Cash  575.00 EUR
+  Income:Rent:Ciceri  -550.00 EUR
+  Income:Rent:Canturina:Expenses
+
+2018-01-16 * "gasolio"
+  Expenses:Transport:Gasoline  50.00 EUR
+  Assets:IT:Cash
+
+2018-01-16 * "dentista"
+  Expenses:Family:Health  100.00 EUR ;apparecchio Abramo
+  Assets:IT:Cash
+
+2018-01-17 * "agonismo Marghe"
+  Expenses:Family:Children  400.00 EUR
+  Assets:IT:Cash
+
+2018-01-18 * "Fogliano"
+  Assets:IT:Cash  200.00 EUR
+  Income:Rent:LaDolceAlbate
+
+2018-01-19 * "valori bollati"
+  Expenses:IT:Taxes:Bollo  50.00 EUR ;2 da 16.00 per comodato + 9 da 2.00
+  Assets:IT:Cash
+
+2018-01-19 * "parcheggio"
+  Expenses:Transport:Toll  5.00 EUR
+  Assets:IT:Cash
+
+2018-01-17 * "carica docce Marghe"
+  Expenses:Family:Children  10.00 EUR
+  Assets:IT:Cash
+
+2018-01-17 * "rimborso stereo mamma"
+  Assets:IT:Cash  119.00 EUR
+  Income:Parents:Reimbursement
+
+2018-01-22 * "Aldi"
+  Expenses:Home:Maintenance  39.96 CHF ;lampade led
+  Expenses:Food:Groceries
+  Assets:CH:Cash  -71.15 CHF
+
+2018-01-22 * "gasolio"
+  Expenses:Transport:Gasoline  20.00 CHF
+  Assets:CH:Cash
+
+2018-01-22 * "rimborso BPSSuisse"
+  Assets:CH:BPSSuisse:Checking  700.00 EUR
+  Assets:IT:Cash
+
+2018-01-23 * "rimborso spese"
+  Assets:IT:Cash  50.00 EUR
+  Income:Albatre:Reimbursement
+
+2018-01-24 * "Obi"
+  Expenses:Home:Maintenance  69.39 EUR ;aspiracenere + detergente colla
+  Assets:IT:Cash
+
+2018-01-13 * "Fuin"
+  Expenses:Personal:Leisure  5.40 EUR ;colazione
+  Assets:IT:Cash
+
+2018-01-25 * "Zanfrini"
+  Expenses:Property:Consultant  500.00 EUR
+  Assets:IT:Cash
+
+2018-01-26 * "Esselunga"
+  Expenses:Food:Groceries  30.88 EUR
+  Assets:IT:Cash
+
+2018-01-29 * "Rimborso Dhimiter"
+  Assets:IT:Cash  80.00 EUR
+  Income:Albatre:Reimbursement
+
+2018-02-01 * "parrucchiere"
+  Expenses:Personal:Leisure  8.00 EUR
+  Assets:IT:Cash
+
+2018-02-02 * "Marcello"
+  Expenses:Home:Maintenance  125.00 EUR ;citofono e luci ufficio
+  Assets:IT:Cash
+
+2018-02-02 * "Baragiola"
+  Expenses:Work:Consultant  300.00 EUR ;pratica catastale Grimaudo
+  Assets:IT:Cash
+
+2018-02-02 * "BricoOK"
+  Expenses:Home:Maintenance  24.00 EUR ;pompa travaso
+  Assets:IT:Cash
+
+2018-02-02 * "CB auto"
+  Expenses:Transport:Maintenance  5.00 EUR ;lampadine
+  Assets:IT:Cash
+
+2018-02-03 * "Aldi"
+  Expenses:Food:Groceries  15.50 CHF
+  Assets:CH:Cash
+
+2018-02-03 * "Aldi"
+  Expenses:Personal:Leisure  7.99 CHF ;portamonete
+  Expenses:Food:Groceries
+  Assets:CH:Cash  -27.15 CHF
+
+2018-02-03 * "Dubini"
+  Expenses:Personal:Leisure  17.80 CHF ;tabacco e sigaro
+  Assets:CH:Cash
+
+2018-02-03 * "gasolio"
+  Expenses:Transport:Gasoline  40.00 CHF
+  Assets:CH:Cash
+
+2018-02-03 * "CipGarden"
+  Expenses:Personal:Gifts  48.00 EUR
+  Assets:IT:Cash
+
+2018-02-03 * "Carrefour"
+  Expenses:Family:Children  5.98 EUR ;shampoo piscina
+  Assets:IT:Cash
+
+2018-02-06 * "raccomandata"
+  Expenses:Postal  5.95 EUR ;Pedroncelli
+  Assets:IT:Cash
+
+2018-02-07 * "Botta"
+  Expenses:Property:Maintenance  400.00 EUR ;nota Teresio + casa
+  Assets:IT:Cash
+
+2018-02-10 * "Paola"
+  Expenses:Family:Paola  200.00 EUR
+  Assets:IT:Cash
+
+2018-02-12 * "Coop"
+  Expenses:Food:Groceries  5.55 EUR
+  Assets:IT:Cash
+
+2018-02-13 * "Mancava"
+  Assets:CH:Cash  60.00 CHF
+  Income:CH:Mancava-ACG
+
+2018-02-14 * "raccomandata"
+  Expenses:Postal  5.95 EUR
+  Assets:IT:Cash
+
+2018-02-14 * "Ciceri"
+  Assets:IT:Cash  605.00 EUR
+  Income:Rent:Ciceri  -550.00 EUR
+  Income:Rent:Canturina:Expenses  -25.00 EUR
+  Income:Rent:Canturina:Water
+
+2018-02-15 * "gasolio"
+  Expenses:Transport:Gasoline  20.00 EUR
+  Assets:IT:Cash
+
+2018-02-15 * "Marcello Feim"
+  Expenses:Home:Maintenance  40.00 EUR
+  Assets:IT:Cash
+
+2018-02-14 * "McDonald"
+  Expenses:Food:Restaurant  26.70  EUR
+  Assets:IT:Cash
+
+2018-02-15 * "quota CRI"
+  Expenses:Personal:Association  10.00 EUR
+  Assets:IT:Cash
+
+2018-02-16 * "ricarica telefonica Camillo"
+  Assets:IT:Cash  30.00 EUR
+  Income:Parents:Reimbursement
+
+2018-02-19 * "Aldi"
+  Expenses:Food:Groceries  40.10 CHF
+  Assets:CH:Cash
+
+2018-02-19 * "rimborso BPSSuisse"
+  Assets:CH:BPSSuisse:Checking  700.00 EUR
+  Assets:IT:Cash
+
+2018-02-19 * "gasolio"
+  Expenses:Transport:Gasoline  50.00 CHF
+  Assets:CH:Cash
+
+2018-02-19 * "Energia Splügen"
+  Expenses:CH:C4:Utilities  271.50 CHF
+  Assets:CH:Cash
+
+2018-02-22 * "elettricista Splügen"
+  Expenses:CH:C4:Property  178.25 CHF
+  Assets:CH:Cash
+
+2018-02-22 * "tasse Splügen"
+  Expenses:CH:C4:Taxes  623.00 CHF
+  Assets:CH:Cash
+
+2018-02-22 * "igienista"
+  Expenses:Personal:Health  140.00 CHF
+  Assets:CH:Cash
+
+2018-02-22 * "Aldi"
+  Expenses:Food:Groceries  29.60 CHF
+  Assets:CH:Cash
+
+2018-02-21 * "rimborso LLeshi"
+  Assets:IT:Cash  35.00 EUR
+  Income:Albatre:Reimbursement
+
+2018-02-22 * "Coop"
+  Expenses:Food:Groceries  7.60 EUR
+  Assets:IT:Cash
+
+2018-03-02 * "versamento IVA per Longhi Costruzioni"
+  Expenses:LonghiCostruzioni  255.00 EUR
+  Assets:IT:Cash
+
+2018-03-02 * "Carnelli"
+  Assets:IT:Cash  1160.00 EUR ;gennaio e febbraio
+  Income:Rent:Carnelli  -1100.00 EUR
+  Income:Rent:Canturina:Expenses
+
+2018-03-05 * "Salute bambini"
+  Expenses:Family:Health  100.00 EUR ;dentista Abramo
+  Expenses:Family:Health  100.00 EUR ;dentista Ulisse
+  Expenses:Family:Health  150.00 EUR ;dermatologo Abramo
+  Assets:IT:Cash
+
+2018-03-05 * "Aldi Italy"
+  Expenses:Home:Maintenance  16.00 EUR ;giardinaggio
+  Expenses:Food:Groceries
+  Assets:IT:Cash  -33.98 EUR
+
+2018-03-05 * "BricoOK"
+  Expenses:Home:Maintenance  6.50 EUR ;legnetti e accendifuoco
+  Assets:IT:Cash
+
+2018-03-06 * "visita fisiatra"
+  Expenses:Personal:Health  28.50 EUR
+  Assets:IT:Cash
+
+2018-03-06 * "McDonald"
+  Expenses:Food:Restaurant  20.05 EUR
+  Assets:IT:Cash
+
+2018-03-06 * "Collegiale Aprica anticipo"
+  Expenses:Family:Children  50.00 EUR
+  Assets:IT:Cash
+
+2018-03-08 * "rubinetto"
+  Expenses:Home:Maintenance  9.00 EUR
+  Assets:IT:Cash
+
+2018-03-08 * "gasolio"
+  Expenses:Transport:Gasoline  10.00 EUR
+  Assets:IT:Cash
+
+2018-03-10 * "gasolio"
+  Expenses:Transport:Gasoline  50.00 EUR
+  Assets:IT:Cash
+
+2018-03-10 * "cena compagni"
+  Expenses:Personal:Leisure  80.00 EUR
+  Assets:IT:Cash
+
+2018-03-12 * "terapia laser"
+  Expenses:Personal:Health  32.70 EUR
+  Assets:IT:Cash
+
+2018-03-12 * "lotteria"
+  Expenses:Personal:Leisure  5.00 EUR
+  Assets:IT:Cash
+
+2018-03-13 * "Ciceri"
+  Assets:IT:Cash  575.00 EUR
+  Income:Rent:Ciceri  -550.00 EUR
+  Income:Rent:Canturina:Expenses
+
+2018-03-15 * "McDonald"
+  Expenses:Food:Restaurant  9.65 EUR
+  Assets:IT:Cash
+
+2018-03-15 * "Fogliano"
+  Assets:IT:Cash  250.00 EUR
+  Income:Rent:LaDolceAlbate
+
+2018-03-16 * "Aldi"
+  Expenses:Food:Groceries  34.85 CHF
+  Expenses:Property:Maintenance  38.95 CHF ;piante da frutta collina
+  Assets:CH:Cash
+
+2018-03-16 * "collegiale Marghe"
+  Expenses:Family:Children  295.00 EUR
+  Assets:IT:Cash
+
+2018-03-16 * "Mandotti"
+  Expenses:Transport:Maintenance  20.00 EUR
+  Assets:IT:Cash
+
+2018-03-19 * "BPSSuisse"
+  Assets:CH:BPSSuisse:Checking  700.00 EUR
+  Assets:IT:Cash
+
+2018-03-19 * "Balzan"
+  Assets:IT:Cash  525.80 EUR
+  Income:Rent:Balzan  -500.00 EUR
+  Income:Rent:Canturina:Expenses  -15.00 EUR
+  Income:Rent:Canturina:Electricity  -10.80 EUR
+
+2018-03-18 * "Fuin"
+  Expenses:Personal:Leisure  5.00 EUR
+  Assets:IT:Cash
+
+2018-03-19 * "Feim"
+  Expenses:Property:Maintenance  170.00 EUR ;citofono e plafoniera luci magazzino
+  Assets:IT:Cash
+
+2018-03-20 * "Testori"
+  Expenses:Property:Maintenance  10.00 EUR ;lucchetto
+  Expenses:Property:Maintenance  24.00 EUR ;duplicazione telecomando
+  Assets:IT:Cash
+
+2018-03-24 * "rimborso Ulisse"
+  Assets:IT:Cash  30.00 EUR
+  Income:Family:Reimbursement
+
+2018-03-23 * "Paola"
+  Expenses:Family:Paola  185.00 EUR
+  Assets:IT:Cash
+
+2018-03-23 * "gasolio"
+  Expenses:Transport:Gasoline  10.00 EUR
+  Assets:IT:Cash
+
+2018-03-24 * "caparra Valdez"
+  Assets:IT:Cash  150.00 EUR
+  Income:Rent:Valdez
+
+2018-03-23 * "integratori"
+  Expenses:Personal:Health  54.00 EUR
+  Assets:IT:Cash
+
+2018-03-28 * "gasolio"
+  Expenses:Transport:Gasoline  5.00 EUR
+  Assets:IT:Cash
+
+2018-03-28 * "Fuin"
+  Expenses:Personal:Leisure  5.00 EUR
+  Assets:IT:Cash
+
+2018-03-29 * "Aldi"
+  Expenses:Food:Groceries  22.85 CHF
+  Assets:CH:Cash
+
+2018-03-29 * "Sigari"
+  Expenses:Personal:Leisure  11.50 CHF
+  Assets:CH:Cash
+
+2018-03-29 * "gasolio"
+  Expenses:Transport:Gasoline  50.20 CHF
+  Assets:CH:Cash
+
+2018-03-30 * "Aldi"
+  Expenses:Personal:Leisure  8.10 CHF
+  Assets:CH:Cash
+
+2018-03-30 * "Al Mancava"
+  Assets:CH:Cash  60.00 CHF
+  Income:CH:Mancava-ACG
+
+2018-04-03 * "rimborso Marghe"
+  Assets:IT:Cash  15.00 EUR
+  Income:Family:Reimbursement
+
+2018-04-05 * "raccomandata Tarek"
+  Expenses:Postal  5.95 EUR
+  Assets:IT:Cash
+
+2018-04-05 * "Coop"
+  Expenses:Food:Groceries  9.19 EUR
+  Assets:IT:Cash
+
+2018-04-06 * "Ristorante cinese"
+  Expenses:Food:Restaurant  105.00 EUR
+  Assets:IT:Cash
+
+2018-04-06 * "Paola"
+  Expenses:Family:Paola  200.00 EUR
+  Assets:IT:Cash
+
+2018-04-11 * "Bianco"
+  Assets:CH:Cash  950.00 EUR
+  Income:Rent:IlBoschetto
+
+2018-04-11 * "lezioni"
+  Assets:IT:Cash  60.00 EUR
+  Income:Lessons
+
+2018-04-12 * "Obi"
+  Expenses:Home:Maintenance  9.15 EUR
+  Assets:IT:Cash
+
+2018-04-12 * "gasolio"
+  Expenses:Transport:Gasoline  10.00 EUR
+  Assets:IT:Cash
+
+2018-04-12 * "Ciceri"
+  Assets:IT:Cash  614.90 EUR
+  Income:Rent:Ciceri  -550.00 EUR
+  Income:Rent:Canturina:Expenses  -25.00 EUR
+  Income:Rent:Canturina:Water
+
+2018-04-12 * "Milli"
+  Assets:IT:Cash  350.00 EUR
+  Income:Rent:Milli
+
+2018-04-13 * "Mancava"
+  Assets:CH:Cash  60.00 CHF
+  Income:CH:Mancava-ACG
+
+2018-04-13 * "Denner"
+  Expenses:Food:Groceries  9.35 CHF
+  Assets:CH:Cash
+
+2018-04-13 * "Aldi"
+  Expenses:Food:Groceries  26.10 CHF
+  Assets:CH:Cash
+
+2018-04-13 * "parcheggio Comacini"
+  Expenses:Transport:Toll  5.00 CHF
+  Assets:CH:Cash
+
+2018-04-13 * "BPSSuisse"
+  Assets:CH:BPSSuisse:Checking  700.00 EUR
+  Assets:IT:Cash
+
+2018-04-13 * "Zanfrini"
+  Expenses:Property:Consultant  1000.00 EUR
+  Assets:IT:Cash
+
+2018-04-13 * "gasolio"
+  Expenses:Transport:Gasoline  50.00 CHF
+  Assets:CH:Cash
+
+2018-04-13 * "Bajrami"
+  Assets:IT:Cash  3100.00 EUR ;mancano 40.40 EUR di spese
+  Income:Rent:Bajrami  -3000.00 EUR
+  Income:Rent:Albatre:Expenses
+
+2018-04-16 * "rimborso LLeshi"
+  Assets:IT:Cash  10.00 EUR
+  Income:Albatre:Reimbursement
+
+2018-04-17 * "dentista"
+  Expenses:Family:Health  100.00 EUR
+  Assets:IT:Cash
+
+2018-04-17 * "rimborso Caspani"
+  Assets:IT:Cash  500.00 EUR ;forse derivante vendita cavalletti
+  Income:Albatre:Reimbursement
+
+2019-04-18 * "Aldi in Euro"
+  Expenses:Food:Groceries  10.00 CHF
+  Assets:CH:Cash
+
+2018-04-18 * "benzina in euro"
+  Expenses:Transport:Gasoline  6.70 EUR
+  Assets:IT:Cash
+
+2018-04-18 * "rimborso Dhimiter"
+  Assets:IT:Cash  100.00 EUR
+  Income:Albatre:Reimbursement
+
+2018-04-18 * "parrucchiere"
+  Expenses:Personal:Leisure  8.00 EUR
+  Assets:IT:Cash
+
+2018-04-20 * "Aldi"
+  Expenses:Personal:Leisure  78.00 CHF
+  Assets:CH:Cash
+
+2018-04-20 * "Splügen tasse"
+  Expenses:CH:C4:Taxes  344.00 CHF ;tasse cantone
+  Expenses:CH:C4:Taxes  139.00 CHF ;tasse comune
+  Assets:CH:Cash
+
+2018-04-20 * "diritti segreteria comune"
+  Expenses:Work:Fees  82.50 EUR
+  Assets:IT:Cash
+
+2018-04-19 * "rimborso vendita cavalletti"
+  Assets:IT:Cash  280.00 EUR
+  Income:LonghiCostruzioni:Reimbursement
+
+2018-04-22 * "contributo piscina OPSA"
+  Expenses:Personal:Leisure  10.00 EUR
+  Assets:IT:Cash
+
+2018-04-24 * "picnic Torno"
+  Expenses:Personal:Leisure  8.50 EUR
+  Assets:IT:Cash
+
+2018-04-25 * "gelato"
+  Expenses:Personal:Leisure  11.50 EUR
+  Assets:IT:Cash
+
+2018-04-26 * "benzina trincia"
+  Expenses:Property:Maintenance  10.00 EUR
+  Assets:IT:Cash
+
+2018-04-27 * "Fuin"
+  Expenses:Personal:Leisure  5.60 EUR
+  Assets:IT:Cash
+
+2018-04-27 * "pranzo libanese"
+  Expenses:Food:Restaurant  18.50 EUR
+  Assets:IT:Cash
+
+2018-04-27 * "Aldi"
+  Expenses:Food:Groceries  37.45 CHF
+  Expenses:Food:Groceries  9.60 CHF
+  Assets:CH:Cash
+
+2018-04-27 * "tassa soggiorno Splügen"
+  Expenses:CH:C4:Taxes  470.00 CHF
+  Assets:CH:Cash
+
+2018-04-27 * "Dubini"
+  Expenses:Personal:Leisure  8.00 CHF
+  Assets:CH:Cash
+
+2018-04-27 * "Aldi Italy"
+  Expenses:Home:Maintenance  20.98 EUR
+  Assets:IT:Cash
+
+2018-04-27 * "benzina"
+  Expenses:Transport:Gasoline  5.00 EUR
+  Assets:IT:Cash
+
+2018-04-29 * "gelato"
+  Expenses:Personal:Leisure  15.50 EUR
+  Assets:IT:Cash
+
+2018-05-02 * "Aldi"
+  Expenses:Personal:Leisure  46.80 CHF
+  Assets:CH:Cash
+
+2018-05-02 * "Aldi Italy"
+  Expenses:Home:Maintenance  24.16 EUR
+  Assets:IT:Cash
+
+2018-05-02 * "Carnelli"
+  Assets:IT:Cash  1199.90 EUR
+  Income:Rent:Carnelli  -1100.00 EUR ;2 mesi
+  Income:Rent:Canturina:Expenses  -60.00 EUR
+  Income:Rent:Canturina:Water
+
+2018-05-02 * "Balzan"
+  Assets:IT:Cash  654.50 EUR
+  Income:Rent:Balzan  -500.00 EUR ;fine locazione
+  Income:Rent:Canturina:Expenses  -15.00 EUR
+  Income:Rent:Canturina:Electricity  -19.80 EUR
+  Income:Rent:Canturina:Water  -119.70 EUR
+
+2018-05-02 * "Balzan, restituzione caparra"
+  Liabilities:IT:RentDeposit  1500.00 EUR
+  Assets:IT:Cash
+
+2018-05-03 * "rimborso cuscino"
+  Assets:IT:Cash  20.00 EUR
+  Income:Parents:Reimbursement
+
+2018-05-03 * "Fogliano"
+  Assets:IT:Cash  250.00 EUR
+  Income:Rent:LaDolceAlbate ;mancano 4050.00 EUR
+
+2018-05-05 * "gasolio"
+  Expenses:Transport:Gasoline  50.05 CHF
+  Assets:CH:Cash
+
+2018-05-05 * "pranzo"
+  Expenses:Food:Restaurant  7.50 EUR
+  Assets:IT:Cash
+
+2018-05-04 * "Valdez"
+  Assets:IT:Cash  350.00 EUR
+  Income:Rent:Valdez
+
+2018-05-05 * "Aldi"
+  Expenses:Personal:Leisure  21.65 CHF
+  Assets:CH:Cash
+
+2018-05-06 * "tablet Abramo"
+  Expenses:Personal:Leisure  250.00 EUR
+  Assets:IT:Cash
+
+2018-05-07 * "Paola"
+  Expenses:Family:Paola  200.00 EUR
+  Assets:IT:Cash
+
+2018-05-10 * "benzina"
+  Expenses:Transport:Gasoline  5.00 EUR
+  Assets:IT:Cash
+
+2018-05-11 * "costumi scuola"
+  Expenses:Family:Children  20.00 EUR
+  Assets:IT:Cash
+
+2018-05-11 * "Boraso"
+  Expenses:LonghiCostruzioni  1500.00 EUR
+  Assets:IT:Cash
+
+2018-05-11 * "McDonald"
+  Expenses:Food:Restaurant  33.00 EUR
+  Assets:IT:Cash
+
+2018-05-11 * "offerta Bangladesh"
+  Expenses:Charity  5.00 EUR
+  Assets:IT:Cash
+
+2018-05-10 * "ricarica Camillo"
+  Assets:IT:Cash  50.00 EUR
+  Income:Parents:Reimbursement
+
+2018-05-12 * "Mezzanzanica"
+  Assets:IT:Cash  775.00 EUR
+  Income:Rent:Mezzanzanica
+
+2018-05-12 * "Robbiani"
+  Assets:IT:Cash  600.00 EUR
+  Income:Rent:Robbiani
+
+2018-05-12 * "iscrizione Cefb"
+  Expenses:Personal:Association  40.00 EUR
+  Assets:IT:Cash
+
+2018-05-13 * "rimborso Hoxha"
+  Assets:IT:Cash  80.00 EUR
+  Income:Albatre:Reimbursement
+
+2018-05-14 * "Ciceri"
+  Assets:IT:Cash  575.00 EUR
+  Income:Rent:Ciceri  -550.00 EUR
+  Income:Rent:Canturina:Expenses
+
+2018-05-15 * "benzina"
+  Expenses:Transport:Gasoline  5.00 EUR
+  Assets:IT:Cash
+
+2018-05-18 * "benzina"
+  Expenses:Transport:Gasoline  5.00 EUR
+  Assets:IT:Cash
+
+2018-05-18 * "Ulisse per gita"
+  Expenses:Family:Children  20.00 EUR
+  Assets:IT:Cash
+
+2018-05-18 * "Battaglino"
+  Assets:IT:Cash  600.00 EUR
+  Income:Rent:Battaglino
+
+2018-05-20 * "CRI mattina"
+  Expenses:Food:Restaurant  10.00 EUR
+  Assets:IT:Cash
+
+2018-05-21 * "Coop"
+  Expenses:Food:Groceries  8.33 EUR
+  Assets:IT:Cash
+
+2018-05-23 * "BPSSuisse"
+  Assets:CH:BPSSuisse:Checking  700.00 EUR
+  Assets:IT:Cash
+
+2018-05-23 * "Aldi"
+  Expenses:Food:Groceries  44.20 CHF
+  Assets:CH:Cash
+
+2018-05-23 * "Condominio Splügen"
+  Expenses:CH:C4:Property  172.00 CHF ;fondo rinnovamento
+  Expenses:CH:C4:Property  755.95 CHF ;1 rata
+  Assets:CH:Cash
+
+2018-05-23 * "gasolio"
+  Expenses:Transport:Gasoline  50.00 CHF
+  Assets:CH:Cash
+
+2018-05-23 * "giardiniere Mancava"
+  Expenses:Home:Maintenance  45.00 EUR ;fragoline e lamponi
+  Assets:IT:Cash
+
+2018-05-24 * "anticipo moto"
+  Expenses:Personal:Leisure  2000.00 EUR ;mancano 700.00 EUR
+  Assets:IT:Cash
+
+2018-05-24 * "benzina"
+  Expenses:Transport:Gasoline  5.00 EUR
+  Assets:IT:Cash
+
+2018-05-25 * "benzina trincia"
+  Expenses:Property:Maintenance  10.00 EUR
+  Assets:IT:Cash
+
+2018-05-25 * "benzina"
+  Expenses:Transport:Gasoline  5.00 EUR
+  Assets:IT:Cash
+
+2018-05-25 * "valori bollati"
+  Expenses:IT:Taxes:Bollo  20.00 EUR
+  Assets:IT:Cash
+
+2018-05-25 * "Merendero"
+  Expenses:Food:Restaurant  12.50 EUR
+  Assets:IT:Cash
+
+2018-05-26 * "compleanno Paola"
+  Expenses:Family:Paola  100.00 EUR
+  Assets:IT:Cash
+
+2018-05-26 * "gelati"
+  Expenses:Personal:Leisure  10.00 EUR
+  Assets:IT:Cash
+
+2018-05-27 * "benzina Yaris"
+  Expenses:Transport:Gasoline  10.00 EUR
+  Assets:IT:Cash
+
+2018-05-28 * "Marghe scuola"
+  Expenses:Family:Children  15.00 EUR
+  Assets:IT:Cash
+
+2018-05-28 * "Lleshi rimborso"
+  Assets:IT:Cash  20.00 EUR
+  Income:Albatre:Reimbursement
+
+2018-05-28 * "Granmercato"
+  Expenses:Food:Groceries  14.32 EUR
+  Assets:IT:Cash
+
+2018-05-30 * "Favuzza"
+  Expenses:Family:Health  50.00 EUR ;visita pediatrica
+  Assets:IT:Cash
+
+2018-05-31 * "saldo moto"
+  Expenses:Personal:Leisure  700.00 EUR
+  Assets:IT:Cash
+
+2018-05-31 * "benzina Honda"
+  Expenses:Transport:Gasoline  10.00 EUR
+  Assets:IT:Cash
+
+2018-06-03 * "Mancava"
+  Assets:CH:Cash  180.00 CHF ;tre sere
+  Income:CH:Mancava-ACG
+
+2018-06-03 * "benzina"
+  Expenses:Transport:Gasoline  16.50 CHF
+  Assets:CH:Cash
+
+2018-06-02 * "libanese"
+  Expenses:Food:Restaurant  7.50 EUR
+  Assets:IT:Cash
+
+2018-06-04 * "vendita attrezzature"
+  Assets:IT:Cash  500.00 EUR
+  Income:LonghiCostruzioni:Reimbursement
+
+2018-06-05 * "BPSSuisse"
+  Assets:CH:BPSSuisse:Checking  700.00 EUR
+  Assets:IT:Cash
+
+2018-06-05 * "GAM"
+  Expenses:Property:Maintenance  13.00 EUR ;pezzo ricambio trincia
+  Assets:IT:Cash
+
+2018-06-05 * "Aldi"
+  Expenses:Personal:Leisure  25.65 CHF
+  Assets:CH:Cash
+
+2018-06-05 * "dentista"
+  Expenses:Family:Health  200.00 EUR
+  Assets:IT:Cash
+
+2018-06-05 * "compleanno Luca"
+  Expenses:Personal:Leisure  50.00 CHF
+  Assets:CH:Cash
+
+2018-06-07 * "Mancava"
+  Assets:CH:Cash  55.00 CHF
+  Income:CH:Mancava-ACG
+
+2018-06-07 * "Aldi"
+  Expenses:Personal:Leisure  11.15 CHF
+  Assets:CH:Cash
+
+2018-06-07 * "Paola"
+  Expenses:Family:Paola  200.00 EUR
+  Assets:IT:Cash
+
+2018-06-08 * "integratore Ulisse"
+  Expenses:Family:Health  15.00 EUR
+  Assets:IT:Cash
+
+2018-06-08 * "Botta"
+  Expenses:Property:Maintenance  139.00 EUR
+  Assets:IT:Cash
+
+2018-06-08 * "Favoni"
+  Expenses:Home:Maintenance  38.00 EUR
+  Assets:IT:Cash
+
+2018-06-08 * "benzina"
+  Expenses:Transport:Gasoline  5.00 EUR
+  Assets:IT:Cash
+
+2018-06-09 * "benzina"
+  Expenses:Transport:Gasoline  13.50 CHF
+  Assets:CH:Cash
+
+2018-06-09 * "Opsa"
+  Expenses:Personal:Leisure  8.50 EUR
+  Assets:IT:Cash
+
+2018-06-09 * "gelati"
+  Expenses:Personal:Leisure  6.60 EUR
+  Assets:IT:Cash
+
+2018-06-11 * "raccomandata Tarabbia"
+  Expenses:Postal  5.95 EUR
+  Assets:IT:Cash
+
+2018-06-12 * "rimborso Ulisse"
+  Assets:IT:Cash  15.00 EUR
+  Income:Family:Reimbursement
+
+2018-06-12 * "veterinario"
+  Expenses:Family:Pets  30.00 EUR
+  Assets:IT:Cash
+
+2018-06-12 * "rimborso margherita"
+  Assets:IT:Cash  8.00 EUR
+  Income:Family:Reimbursement
+
+2018-06-14 * "Bar Roma"
+  Expenses:Personal:Leisure  6.50 EUR
+  Assets:IT:Cash
+
+2018-06-15 * "valori bollati"
+  Expenses:IT:Taxes:Bollo  16.00 EUR
+  Assets:IT:Cash
+
+2018-06-13 * "McDonald"
+  Expenses:Food:Restaurant  31.20 EUR
+  Assets:IT:Cash
+
+2018-06-15 * "Ciceri"
+  Assets:IT:Cash  575.00 EUR
+  Income:Rent:Ciceri  -550.00 EUR
+  Income:Rent:Canturina:Expenses
+
+2018-06-15 * "Valdez"
+  Assets:IT:Cash  525.00 EUR
+  Income:Rent:Valdez  -500.00 EUR
+  Income:Rent:Canturina:Expenses
+
+2018-06-17 * "Oca bianca"
+  Expenses:Food:Restaurant  85.00 EUR
+  Assets:IT:Cash
+
+2018-06-16 * "pizzeria Opsa"
+  Expenses:Food:Restaurant  22.00 EUR
+  Assets:IT:Cash
+
+2018-06-19 * "Fogliano"
+  Assets:IT:Cash  250.00 EUR
+  Income:Rent:LaDolceAlbate
+
+2018-06-19 * "gelato"
+  Expenses:Personal:Leisure  18.00 EUR
+  Assets:IT:Cash
+
+2018-06-20 * "benzina"
+  Expenses:Transport:Gasoline  5.00 EUR
+  Assets:IT:Cash
+
+2018-06-22 * "fruttivendolo"
+  Expenses:Food:Groceries  43.30 EUR
+  Assets:IT:Cash
+
+2018-06-23 * "gasolio"
+  Expenses:Transport:Gasoline  70.00 CHF
+  Assets:CH:Cash
+
+2018-06-23 * "benzina"
+  Expenses:Transport:Gasoline  18.00 CHF
+  Assets:CH:Cash
+
+2018-06-23 * "Splügen EUR"
+  Expenses:Food:Restaurant  18.00 EUR ;06-23: "La Capriata"
+  Assets:IT:Cash
+
+2018-06-24 * "Splügen CHF"
+  Expenses:Personal:Leisure  21.00 ;06-24: minigolf
+  Expenses:Food:Groceries  11.55 CHF
+  Expenses:Food:Groceries  7.80 CHF
+  Expenses:Personal:Leisure  20.00 CHF ;06-25: "Viamala"
+  Expenses:Food:Groceries  66.90 CHF ;Aldi
+  Expenses:Family:Children  30.00 CHF ;Aldi
+  Expenses:Food:Groceries  9.20 CHF
+  Expenses:Food:Groceries  7.40 CHF
+  Expenses:Food:Groceries  11.75 CHF
+  Expenses:Food:Groceries  5.50 CHF
+  Expenses:Family:Children  7.00 CHF ;06-27: gelati
+  Expenses:Food:Groceries  6.80 CHF
+  Expenses:Food:Groceries  7.85 CHF
+  Expenses:Personal:Leisure  46.40 CHF ;06-28: Mira Todi gelati
+  Expenses:Food:Groceries  9.80 CHF
+  Expenses:Food:Groceries  6.80 CHF
+  Expenses:Personal:Leisure  71.90 CHF ;06-29: piscina Andeer
+  Expenses:Personal:Leisure  25.00 CHF ;"Alp Bergalga"
+  Expenses:Food:Groceries  14.00 CHF ;pane
+  Expenses:Food:Groceries  8.65 CHF ;Volg
+  Expenses:Food:Groceries  20.00 CHF ;latteria
+  Expenses:Transport:Gasoline  16.20 CHF ;06-30: benzina
+  Assets:CH:Cash
+
+2018-06-30 * "festa SS. Pietro e Paolo"
+  Expenses:Personal:Leisure  28.00 EUR
+  Assets:IT:Cash
+
+2018-07-03 * "bollo moto"
+  Expenses:Transport:InsuranceAndFees  56.23 EUR
+  Assets:IT:Cash
+
+2018-07-03 * "DiEmme"
+  Expenses:Work:Office  12.00 EUR
+  Assets:IT:Cash
+
+2018-07-03 * "Marra"
+  Expenses:Personal:Leisure  10.24 EUR
+  Assets:IT:Cash
+
+2018-07-04 * "Dervio"
+  Expenses:Food:Restaurant  43.00 EUR
+  Expenses:Transport:Toll  6.00 EUR
+  Assets:IT:Cash
+
+2018-07-05 * "Nege"
+  Expenses:Home:Maintenance  20.00 EUR
+  Assets:IT:Cash
+
+2018-07-03 * "Carnelli"
+  Assets:IT:Cash 1202.84 EUR
+  Income:Rent:Carnelli  -1100.00 EUR
+  Income:Rent:Canturina:Expenses  -60.00 EUR
+  Income:Rent:Canturina:Water  -42.84 EUR
+
+2018-07-05 * "Milli"
+  Assets:IT:Cash  350.00 EUR
+  Income:Rent:Milli
+
+2018-07-05 * "Longoni"
+  Expenses:Personal:Leisure  74.49 EUR
+  Assets:IT:Cash
+
+2018-07-07 * "Consorzio Albese"
+  Expenses:Food:Groceries  78.76 EUR
+  Assets:IT:Cash
+
+2018-07-07 * "Aldi Italy"
+  Expenses:Personal:Leisure  24.28 EUR
+  Assets:IT:Cash
+
+2018-06-10 * "BPSSuisse"
+  Assets:CH:BPSSuisse:Checking  700.00 EUR
+  Assets:IT:Cash
+
+2018-07-10 * "Aldi"
+  Expenses:Personal:Leisure  34.45 CHF
+  Assets:CH:Cash
+
+2018-07-10 * "caschi e interfono"
+  Expenses:Personal:Leisure  630.00 EUR
+  Assets:IT:Cash
+
+2018-07-11 * "Paola"
+  Expenses:Family:Paola  200.00 EUR
+  Assets:IT:Cash
+
+2018-07-11 * "Aldi Italy"
+  Expenses:Home:Maintenance  15.47 EUR
+  Assets:IT:Cash
+
+2018-07-12 * "gasolio"
+  Expenses:Transport:Gasoline  10.00 EUR
+  Assets:IT:Cash
+
+2018-07-12 * "vernici"
+  Expenses:Home:Maintenance  59.54 EUR
+  Assets:IT:Cash
+
+2018-07-12 * "benzina"
+  Expenses:Transport:Gasoline  5.00 EUR
+  Assets:IT:Cash
+
+2018-07-12 * "cena Cri"
+  Expenses:Food:Restaurant  9.50 EUR
+  Assets:IT:Cash
+
+2018-07-12 * "certificazione Paolillo"
+  Assets:IT:Cash  100.00 EUR
+  Income:Work
+
+2018-07-13 * "vernici"
+  Expenses:Home:Maintenance  68.00 EUR
+  Assets:IT:Cash
+
+2018-07-14 * "benzina"
+  Expenses:Transport:Gasoline  17.70 CHF
+  Assets:CH:Cash
+
+2018-07-14 * "Valdez"
+  Assets:IT:Cash  395.00 EUR
+  Income:Rent:Valdez  -500.00 EUR;-130.00 per manutenzione caldaia
+  Income:Rent:Canturina:Expenses  -25.00 EUR
+  Expenses:Property:Maintenance  130.00 EUR ;caldaia
+
+2018-07-14 * "Ciceri"
+  Assets:IT:Cash  617.84 EUR
+  Income:Rent:Ciceri  -550.00 EUR
+  Income:Rent:Canturina:Water  -42.84 EUR
+  Income:Rent:Canturina:Expenses  -25.00 EUR
+
+2018-07-14 * "Ulisse Itala"
+  Expenses:Family:Children  160.00 EUR
+  Assets:IT:Cash
+
+2018-07-16 * "rimborso LLeshi"
+  Assets:IT:Cash  70.00 EUR
+  Income:Albatre:Reimbursement
+
+2018-07-17 * "Bianco"
+  Assets:IT:Cash  500.00 EUR ;per un anno (sigh) invece di 950.00
+  Income:Rent:IlBoschetto
+
+2018-07-07 * "gelato"
+  Expenses:Personal:Leisure  12.50 EUR
+  Assets:IT:Cash
+
+2018-07-17 * "Aldi Italy"
+  Expenses:Personal:Leisure  14.51 EUR
+  Assets:IT:Cash
+
+2018-07-19 * "Fuin"
+  Expenses:Personal:Leisure  5.40 EUR
+  Assets:IT:Cash
+
+2018-07-19 * "Dhimiter"
+  Assets:IT:Cash  15.00 EUR
+  Income:Albatre:Reimbursement ;acqua non è più pagata
+
+2018-07-20 * "Mancava"
+  Assets:CH:Cash  60.00 CHF
+  Income:CH:Mancava-ACG
+
+2018-07-20 * "Aldi"
+  Expenses:Personal:Leisure  30.45 CHF
+  Assets:CH:Cash
+
+2018-07-21 * "rimborso APE Palumbo"
+  Assets:IT:Cash  10.00 EUR
+  Income:Work:Reimbursement
+
+2018-07-20 * "pizzeria"
+  Expenses:Food:Restaurant  60.00 EUR
+  Assets:IT:Cash
+
+2018-07-23 * "Ikea restaurant"
+  Expenses:Food:Restaurant  25.96 EUR
+  Assets:IT:Cash
+
+2018-07-23 * "Ikea arredo"
+  Expenses:Home:Maintenance  230.00 EUR
+  Assets:IT:Cash
+
+2018-07-24 * "benzina"
+  Expenses:Transport:Gasoline  16.00 CHF
+  Assets:CH:Cash
+
+2018-07-24 * "Aldi"
+  Expenses:Personal:Leisure  19.20 CHF
+  Assets:CH:Cash
+
+2018-07-24 * "Wheelup"
+  Expenses:Personal:Leisure  47.50 EUR
+  Assets:CH:Cash
+
+2018-07-25 * "gasolio"
+  Expenses:Home:Gas  40.00 EUR
+  Assets:IT:Cash
+
+2018-07-25 * "bar Dervio"
+  Expenses:Food:Restaurant  37.80 EUR
+  Assets:IT:Cash
+
+2018-07-28 * "Aldi Italy"
+  Expenses:Food:Groceries  13.22 EUR
+  Assets:IT:Cash
+
+2018-07-29 * "Caveja"
+  Expenses:Food:Restaurant  13.00 EUR
+  Assets:IT:Cash
+
+2018-07-30 * "McDonald"
+  Expenses:Food:Restaurant  6.80 EUR
+  Assets:IT:Cash
+
+2018-07-31 * "Aldi"
+  Expenses:Personal:Leisure  19.60 CHF
+  Assets:CH:Cash
+
+2018-07-30 * "scheda telefonica Sunrise"
+  Expenses:Home:Phonternet  20.00 CHF
+  Assets:CH:Cash
+
+2018-08-01 * "Splügen CHF"
+  Expenses:Transport:Gasoline  14.35 CHF
+  Expenses:Food:Groceries  6.30 CHF ;pranzo S. Bernardino
+  Expenses:Food:Groceries  30.00 CHF ;spese Paola
+  Expenses:Food:Groceries  15.65 CHF ;pane latte
+  Expenses:Personal:Leisure  12.35 CHF ;merenda S. Bernardino
+  Expenses:Food:Groceries  8.95 CHF
+  Expenses:CH:C4:Utilities  25.00 CHF ;vignette spazzatura
+  Expenses:Personal:Leisure  27.00 CHF ;piscina Thusis
+  Expenses:Personal:Leisure  14.50 CHF ;gelati piscina
+  Expenses:Food:Groceries  17.25 CHF
+  Expenses:Food:Groceries  7.05 CHF
+  Expenses:Food:Groceries  10.20 CHF
+  Expenses:Food:Groceries  9.50 CHF
+  Expenses:Transport:Gasoline  20.00 CHF
+  Expenses:Personal:Leisure  16.00 CHF ;gelati Lenzerheid
+  Expenses:Food:Groceries  23.25 CHF
+  Expenses:Food:Groceries  13.75 CHF
+  Assets:CH:Cash
+
+2018-08-03 * "Splügen Visa"
+  Expenses:Food:Groceries  88.95 CHF
+  Expenses:CreditCard:Visa
+
+2018-08-04 * "Splügen EUR"
+  Expenses:Transport:Gasoline  40.00 EUR
+  Expenses:Personal:Leisure  22.50 EUR
+  Expenses:Personal:Leisure  8.00 EUR ;bar lido Ossuccio
+  Assets:IT:Cash
+
+2018-08-10 * "benzina"
+  Expenses:Transport:Gasoline  18.10 CHF
+  Assets:CH:Cash
+
+2018-08-10 * "Splügen condominio"
+  Expenses:CH:C4:Property  946.00 CHF
+  Assets:CH:Cash
+
+2018-08-10 * "multa Thusis"
+  Expenses:Personal:Leisure  40.00 CHF
+  Assets:CH:Cash
+
+2018-08-10 * "Energia Splügen"
+  Expenses:CH:C4:Utilities  226.15 CHF
+  Assets:CH:Cash ; versato 50.00 Euro
+
+;; 2018-08-10 * "conversione valuta"
+;;   Assets:CH:Cash  60.00 CHF
+;;   Assets:IT:Cash  -50.00 EUR
+
+2018-08-10 * "Aldi"
+  Expenses:Home:Maintenance  20.00 EUR ;in realtà 17.95 CHF
+  Assets:IT:Cash
+
+2018-08-11 * "BricoOK"
+  Expenses:Home:Maintenance  6.80 EUR
+  Assets:IT:Cash
+
+2018-08-11 * "Obi"
+  Expenses:Home:Maintenance 5.38 EUR
+  Assets:IT:Cash
+
+2018-08-12 * "focacceria"
+  Expenses:Personal:Leisure  6.00 EUR
+  Assets:IT:Cash
+
+2018-08-11 * "Ciceri"
+  Assets:IT:Cash  575.00 EUR
+  Income:Rent:Ciceri  -550.00 EUR
+  Income:Rent:Canturina:Expenses
+
+2018-08-11 * "rimborso Ulisse"
+  Assets:IT:Cash  220.00 EUR ;tablet + custodia
+  Income:Family:Reimbursement
+
+2018-08-12 * "colazione"
+  Expenses:Personal:Leisure  5.80 EUR
+  Assets:IT:Cash
+
+2018-08-12 * "Gran Mercato"
+  Expenses:Food:Groceries  36.13 EUR
+  Assets:IT:Cash
+
+2018-08-14 * "Valdez"
+  Assets:IT:Cash  525.00 EUR
+  Income:Rent:Valdez  -500.00 EUR
+  Income:Rent:Canturina:Expenses
+
+2018-08-15 * "Dervio"
+  Expenses:Personal:Leisure  10.00 EUR
+  Expenses:Food:Restaurant  38.00 EUR
+  Assets:IT:Cash
+
+2018-08-16 * "foto tessera"
+  Expenses:Family:Children  10.00 EUR
+  Assets:IT:Cash
+
+2018-08-16 * "focacceria"
+  Expenses:Personal:Leisure  9.00 EUR
+  Assets:IT:Cash
+
+2018-08-17 * "Idajet"
+  Assets:IT:Cash  2120.00 EUR
+  Income:Rent:Bajrami  -2000.00 EUR ;4 months
+  Expenses:Albatre:Water  -46.00 EUR
+  Expenses:Albatre:Water  -13.00 EUR ;debit
+  Expenses:Albatre:Electricity  -27.00 EUR ;debit
+  Expenses:Albatre:Electricity  -34.00
+
+  2018-08-13 * "focaccia"
+  Expenses:Personal:Leisure  6.15 EUR
+  Assets:IT:Cash
+
+2018-08-19 * "pasticcini"
+  Expenses:Personal:Leisure  19.84 EUR
+  Assets:IT:Cash
+
+2018-08-18 * "McDonald"
+  Expenses:Food:Restaurant  44.50 EUR
+  Assets:IT:Cash
+
+2018-08-12 * "gelateria"
+  Expenses:Personal:Leisure  10.80 EUR
+  Assets:IT:Cash
+
+2018-08-17 * "parrucchiere"
+  Expenses:Personal:Leisure  8.00 EUR
+  Assets:IT:Cash
+  
+2018-08-19 * "Abramo rimborso Huawey"
+  Assets:IT:Cash  220.00 EUR
+  Income:Family:Reimbursement
+
+2018-08-20 * "Coop"
+  Expenses:Food:Groceries  7.00 EUR
+  Assets:IT:Cash
+
+2018-08-21 * "Arcaplanet"
+  Expenses:Family:Pets  15.90 EUR ;collare
+  Assets:IT:Cash
+
+2018-08-23 * "benzina"
+  Expenses:Transport:Gasoline  8.86 EUR
+  Assets:IT:Cash
+
+2018-08-24 * "Mancava"
+  Assets:CH:Cash  180.00 CHF
+  Income:CH:Mancava-ACG
+
+2018-08-23 * "Pizzeria Isolanti"
+  Expenses:Food:Restaurant  35.00 EUR
+  Assets:IT:Cash
+
+2018-08-24 * "brioches"
+  Expenses:Personal:Leisure  5.00 EUR
+  Assets:IT:Cash
+
+2018-08-26 * "Gran Mercato"
+  Expenses:Food:Groceries  17.46 EUR
+  Assets:IT:Cash
+
+2018-08-27 * "iphone Abramo"
+  Assets:IT:Cash  250.00 EUR ;mancano 20.00 EUR
+  Income:Family:Reimbursement
+
+2018-08-27 * "dentista"
+  Expenses:Family:Health  200.00 EUR
+  Assets:IT:Cash
+
+2018-08-27 * "benzina"
+  Expenses:Transport:Gasoline  13.20 CHF
+  Assets:CH:Cash
+
+2018-08-28 * "giro in moto"
+  Expenses:Personal:Leisure  100.00 EUR ;mezza pensione Buca
+  Expenses:Food:Restaurant  41.00 EUR ;pranzo Borgotaro
+  Expenses:Personal:Leisure  8.10 EUR ;colazione Fuin
+  Expenses:Personal:Leisure  14.50 EUR ;libri Chiusi della Verna
+  Expenses:Food:Restaurant  29.50 EUR ;Orlando
+  Expenses:Food:Restaurant  14.25 EUR ;McDonald
+  Expenses:Transport:Toll  64.00 EUR ;autostrade - 20.00 EUR Viacard
+  Expenses:Transport:Gasoline  52.00 EUR
+  Assets:IT:Cash
+
+2018-08-31 * "Fiera S.Abbondio"
+  Expenses:Food:Restaurant  79.00 EUR
+  Assets:IT:Cash
+
+2018-09-04 * "Carnelli"
+  Assets:IT:Cash  1183.18 EUR ;2 months
+  Income:Rent:Carnelli  -1100.00 EUR
+  Income:Rent:Canturina:Expenses  -60.00 EUR
+  Expenses:Canturina:Water  -23.18 EUR
+
+2018-09-04 * "rimborso biglietti museo"
+  Assets:IT:Cash  50.00 EUR
+  Income:Family:Reimbursement
+
+2018-09-03 * "Ikea"
+  Expenses:Personal:Leisure  130.00 EUR
+  Expenses:Food:Restaurant  53.00 EUR
+  Assets:IT:Cash
+
+2018-09-04 * "Rinnovo patente"
+  Expenses:Transport:InsuranceAndFees  90.00 EUR
+  Assets:IT:Cash
+
+2018-09-06 * "benzina"
+  Expenses:Transport:Gasoline  19.30 CHF
+  Assets:CH:Cash
+
+2018-09-06 * "focacceria"
+  Expenses:Personal:Leisure  11.00 EUR
+  Assets:IT:Cash
+
+2018-09-06 * "raccomandata Salt"
+  Expenses:Postal  6.30 CHF
+  Assets:CH:Cash
+
+2018-09-07 * "serratura collina e duplicazione chiavi"
+  Expenses:Property:Maintenance  55.00 EUR;
+  Assets:IT:Cash
+
+2018-09-09 * "colazione Marra"
+  Expenses:Personal:Leisure  17.80 EUR
+  Assets:IT:Cash
+
+2018-09-09 * "gasolio"
+  Expenses:Transport:Gasoline  40.00 EUR
+  Assets:IT:Cash
+
+2018-09-12 * "rimborso per eccesso di spesa"
+  Assets:IT:Cash  20.00 EUR
+  Income:Family:Reimbursement
+
+2018-09-12 * "Ciceri"
+  Assets:IT:Cash  598.18 EUR
+  Income:Rent:Ciceri  -550 EUR
+  Income:Rent:Canturina:Expenses  -25.00 EUR
+  Expenses:Canturina:Water  -23.18 EUR
+
+2018-09-12 * "d'Aniello per Paola - 2 anni contabilità"
+  Expenses:IT:Taxes:Consultant  350.00 EUR
+  Assets:IT:Cash
+
+2018-09-12 * "Paola"
+  Expenses:Family:Paola  200.00 EUR
+  Assets:IT:Cash
+
+2018-09-15 * "rimborso ricarica"
+  Assets:IT:Cash  50.00 EUR
+  Income:Parents:Reimbursement
+
+2018-09-15 * "Dervio"
+  Expenses:Food:Restaurant  24.20 EUR
+  Assets:IT:Cash
+
+2018-09-15 * "gelati"
+  Expenses:Personal:Leisure  6.50 EUR
+  Assets:IT:Cash
+  
+2018-09-17 * "Aldi Italy"
+  Expenses:Personal:Leisure  20.00 EUR
+  Assets:IT:Cash
+
+2018-09-17 * "benzina"
+  Expenses:Transport:Gasoline  10.00 EUR
+  Assets:IT:Cash
+
+2018-09-14 * "shawarma e Felafel"
+  Expenses:Food:Restaurant  13.50 EUR
+  Assets:IT:Cash
+
+2018-09-18 * "Cena con Luca Mombelli"
+  Expenses:Food:Restaurant  20.00 EUR
+  Assets:IT:Cash
+
+2018-09-19 * "benzina"
+  Expenses:Transport:Gasoline  17.00 CHF
+  Assets:CH:Cash
+
+2018-09-19 * "Aldi"
+  Expenses:Personal:Leisure  20.95 CHF
+  Assets:IT:Cash
+
+2018-09-19 * "mancia Abramo"
+  Expenses:Family:Children  10.00 EUR
+  Assets:IT:Cash
+
+2018-09-21 * "gasolio"
+  Expenses:Transport:Gasoline  20.00 EUR
+  Assets:IT:Cash
+
+2018-09-21 * "alpini"
+  Expenses:Food:Restaurant  51.00 EUR
+  Assets:IT:Cash
+
+2018-09-21 * "Fogliano"
+  Assets:IT:Cash  300.00 EUR
+  Income:Rent:LaDolceAlbate ;mancano 3500.00 EUR
+
+2018-09-21 * "gelati"
+  Expenses:Personal:Leisure  11.50 EUR
+  Assets:IT:Cash
+
+2018-09-23 * "Opsa"
+  Expenses:Personal:Leisure  7.80 EUR
+  Assets:IT:Cash
+
+2018-09-24 * "farmacia"
+  Expenses:Personal:Health  18.80 EUR
+  Assets:IT:Cash
+
+2018-09-25 * "compleanno Ulisse merenda"
+  Expenses:Family:Children  20.00 EUR
+  Assets:IT:Cash
+
+2018-09-28 * "Mancava"
+  Assets:CH:Cash  280.00 CHF ;dividendi
+  Assets:CH:Cash  60.00 CHF ;paghetta
+  Income:CH:Mancava-ACG
+
+2018-09-28 * "Pebble rimborso"
+  Expenses:Personal:Leisure  70.00 CHF ;in realtà sarebbero 67.00 CHF
+  Assets:CH:Cash
+
+2018-09-28 * "benzina"
+  Expenses:Transport:Gasoline  16.50 CHF
+  Assets:CH:Cash
+
+2018-09-28 * "Aldi"
+  Expenses:Food:Groceries  5.15 CHF
+  Assets:CH:Cash
+
+2018-09-29 * "Torno"
+  Expenses:Food:Restaurant  50.00 EUR
+  Assets:IT:Cash
+
+2018-09-28 * "rimborso BPS"
+  Assets:CH:BPSSuisse:Checking  2800.00 EUR
+  Assets:IT:Cash
+
+2018-09-30 * "rimborso Abramo"
+  Assets:IT:Cash  80.00 EUR
+  Income:Family:Reimbursement
+
+2018-09-30 * "regalo Ulisse"
+  Expenses:Family:Children  100.00 EUR
+  Assets:IT:Cash
+
+2018-10-01 * "rimborso Ulisse"
+  Assets:IT:Cash  65.00 EUR
+  Income:Family:Reimbursement
+
+2018-10-03 * "biglietti bus"
+  Expenses:Family:Children  22.00 EUR
+  Assets:IT:Cash
+
+2018-10-03 * "bolli"
+  Expenses:IT:Taxes:Bollo  20.00 EUR
+  Assets:IT:Cash
+
+2018-10-03 * "Diabolik"
+  Expenses:Family:Children  5.00 EUR
+  Assets:IT:Cash
+
+2018-10-04 * "contributo scuola Abramo da nonni"
+  Assets:IT:Cash  1000.00 EUR
+  Income:Parents:Donation
+  
+2018-10-05 * "piscina Marghe"
+  Expenses:Family:Children  980.00 EUR
+  Assets:IT:Cash
+
+2018-10-05 * "Milli"
+  Assets:IT:Cash  350.00 EUR
+  Income:Rent:Milli
+
+2018-10-08 * "storno a Ulisse per rimborso Amazon"
+  Expenses:Family:Children  20.00 EUR
+  Assets:IT:Cash
+
+2018-10-07 * "gelato"
+  Expenses:Personal:Leisure  15.50 EUR
+  Assets:IT:Cash
+
+2018-10-09 * "benzina"
+  Expenses:Transport:Gasoline  10.00 EUR
+  Assets:IT:Cash
+
+2018-10-09 * "dentista"
+  Expenses:Family:Health  200.00 EUR
+  Assets:IT:Cash
+
+2018-10-09 * "termoscud"
+  Expenses:Personal:Leisure  99.60 EUR
+  Assets:IT:Cash
+
+2018-10-10 * "Ugo Galimberti"
+  Expenses:Personal:Leisure  87.00 CHF ;pebble time steel
+  Assets:CH:Cash
+
+2018-10-10 * "Aldi"
+  Expenses:Personal:Leisure  36.60 CHF
+  Assets:CH:Cash
+
+2018-10-12 * "Bianco"
+  Assets:IT:Cash  500.00 EUR
+  Income:Rent:IlBoschetto
+
+2018-10-13 * "BBB"
+  Expenses:Personal:Leisure  10.00 EUR ;pizze
+  Expenses:Personal:Leisure  4.00 EUR ;cappuccino e brioche
+  Expenses:Transport:Gasoline  30.00 ;gasolio
+  Expenses:Personal:Leisure  5.00 EUR ;carne brace
+  Expenses:Food:Restaurant  9.70 EUR ;pranzo domenica
+  Assets:IT:Cash
+
+2018-10-15 * "Valdez"
+  Assets:IT:Cash  548.18 EUR
+  Income:Rent:Valdez  -500.00 EUR
+  Income:Rent:Canturina:Expenses  -25.00 EUR
+  Expenses:Canturina:Water  -23.18 EUR
+  
+2018-10-16 * "Aldi"
+  Expenses:Personal:Leisure  104.05 CHF
+  Assets:CH:Cash
+
+2018-10-16 * "BPSsuisse"
+  Assets:CH:BPSSuisse:Checking  1900.00 EUR
+  Assets:IT:Cash
+
+2018-10-16 * "benzina"
+  Expenses:Transport:Gasoline  16.00 CHF
+  Assets:CH:Cash
+
+2018-10-15 * "Coop"
+  Expenses:Food:Groceries  9.66 EUR
+  Assets:IT:Cash
+
+2018-10-17 * "Aldi"
+  Expenses:Personal:Leisure  30.00 CHF
+  Expenses:Personal:Leisure  -20.00 CHF ;restituzione articolo
+  Assets:CH:Cash
+
+2018-10-16 * "Ciceri"
+  Assets:IT:Cash  575.00 EUR
+  Income:Rent:Ciceri  -550.00 EUR
+  Income:Rent:Canturina:Expenses
+
+2018-10-18 * "Marra"
+  Expenses:Personal:Leisure  7.30 EUR
+  Assets:IT:Cash
+
+2018-10-20 * "Locanda PP"
+  Expenses:Food:Restaurant  29.50 EUR
+  Assets:IT:Cash
+
+2018-10-22 * "Paola"
+  Expenses:Family:Paola  200.00 EUR
+  Assets:IT:Cash
+
+2018-10-24 * "Assicurazione Eracle"
+  Expenses:Family:Children  10.00 EUR
+  Assets:IT:Cash
+
+2018-10-24 * "benzina"
+  Expenses:Transport:Gasoline  5.00 EUR
+  Assets:IT:Cash
+
+2018-10-24 * "Cadenazzi"
+  Expenses:Canturina:Maintenance  1000.00 EUR ;finestre Ciceri
+  Assets:IT:Cash
+
+2018-10-25 * "Comune"
+  Expenses:Family:Children  44.00 EUR ;carta identità Ulisse e Marghe
+  Assets:IT:Cash
+
+2018-10-25 * "McDonald"
+  Expenses:Food:Restaurant  9.85 EUR
+  Assets:IT:Cash
+
+2018-10-25 * "benzina"
+  Expenses:Transport:Gasoline  16.00 CHF
+  Assets:CH:Cash
+
+2018-10-26 * "Munto"
+  Expenses:Food:Restaurant  13.70 EUR
+  Assets:IT:Cash
+
+2018-10-26 * "Aldi Italy"
+  Expenses:Food:Groceries  5.52 EUR
+  Expenses:Personal:Leisure
+  Assets:IT:Cash  -24.38 EUR
+
+2018-10-30 * "Sigari"
+  Expenses:Personal:Leisure  19.70 CHF
+  Assets:CH:Cash
+
+2018-10-30 * "benzina"
+  Expenses:Transport:Gasoline  8.80 EUR
+  Assets:IT:Cash
+
+2018-10-30 * "Aldi"
+  Expenses:Personal:Leisure  5.00 EUR
+  Assets:IT:Cash
+
+2018-10-27 * "Coop"
+  Expenses:Food:Groceries  17.92 EUR
+  Assets:IT:Cash
+
+2018-10-31 * "Bricook"
+  Expenses:Home:Maintenance  12.30 EUR ;accendifuoco
+  Assets:IT:Cash
+
+2018-10-31 * "Consorzio Agrario"
+  Expenses:Food:Groceries  34.11 EUR
+  Assets:IT:Cash
+
+2018-11-02 * "Carnelli"
+  Assets:IT:Cash  1160.00 EUR ;2 months, in realtà 1180.00
+  Income:Rent:Carnelli  -1100.00 EUR
+  Income:Rent:Canturina:Expenses  -60.00 EUR
+
+2018-11-03 * "Cinema e McDonald"
+  Expenses:Personal:Leisure  32.50 EUR
+  Expenses:Personal:Leisure  4.50 EUR ;popcorn
+  Expenses:Food:Restaurant  36.60 EUR ;cena
+  Assets:IT:Cash
+
+2018-11-05 * "Aldi Italy"
+  Expenses:Home:Maintenance  31.41 EUR
+  Expenses:Food:Groceries
+  Assets:IT:Cash  -43.80 EUR
+
+2018-11-05 * "benzina"
+  Expenses:Transport:Gasoline  5.00 EUR
+  Assets:IT:Cash
+
+2018-11-06 * "EICMA"
+  Expenses:Food:Restaurant  12.00 EUR
+  Expenses:Transport:Toll  10.00 EUR
+  Assets:IT:Cash
+
+2018-11-05 * "parrucchiere"
+  Expenses:Personal:Leisure  8.00 EUR
+  Assets:IT:Cash
+
+2018-11-10 * "Certificato Abramo"
+  Expenses:Family:Health  45.00 EUR 
+  Assets:IT:Cash
+
+2018-11-10 * "Munto"
+  Expenses:Food:Restaurant  34.90 EUR
+  Assets:IT:Cash
+
+2018-11-10 * "Aldi Italy"
+  Expenses:Family:Children  8.00 EUR
+  Expenses:Family:Paola  12.00 EUR
+  Expenses:Food:Groceries
+  Assets:IT:Cash  -53.56 EUR
+
+2018-11-10 * "Battaglino"
+  Assets:IT:Cash  600.00 EUR
+  Income:Rent:Battaglino
+
+2018-11-12 * "Robbiani"
+  Assets:IT:Cash  600.00 EUR
+  Income:Rent:Robbiani
+
+2018-11-10 * "Lleshi"
+  Expenses:Parents  12.00 EUR ;resto affitto
+  Assets:IT:Cash
+
+2018-11-12 * "Mezzanzanica"
+  Assets:IT:Cash  675.00 EUR ;restituiti 100.00 EUR per rifacimento lavello
+  Income:Rent:Mezzanzanica
+
+2018-11-12 * "Dhimiter"
+  Expenses:Parents  16.00 EUR ;resto affitto
+  Assets:IT:Cash
+
+2018-11-13 * "Svizzera in EUR"
+  Expenses:Transport:Gasoline  14.57 EUR
+  Expenses:Food:Groceries  5.00 EUR ;Migros lievito + cubetti accendifuoco
+  Assets:IT:Cash
+
+2018-11-13 * "BPSsuisse"
+  Assets:CH:BPSSuisse:Checking  3000.00 EUR
+  Assets:IT:Cash
+
+2018-11-13 * "McDonald"
+  Expenses:Family:Children  8.15 EUR ;pranzo Ulisse
+  Assets:IT:Cash
+
+2018-11-12 * "gasolio"
+  Expenses:Transport:Gasoline  20.00 EUR
+  Assets:IT:Cash
+
+2018-11-14 * "nuova SIM numero Abramo"
+  Expenses:Family:Children  15.00 EUR
+  Assets:IT:Cash
+
+2018-11-14 * "Ciceri"
+  Assets:IT:Cash  575.00 EUR
+  Income:Rent:Ciceri  -550.00 EUR
+  Income:Rent:Canturina:Expenses
+
+2018-11-16 * "gasolio in svizzera"
+  Expenses:Transport:Gasoline  40.00 EUR
+  Assets:IT:Cash ; pagato in EUR
+
+2018-11-15 * "McDonald"
+  Expenses:Food:Restaurant  8.40 EUR
+  Assets:IT:Cash
+
+2018-11-16 * "Aldi"
+  Expenses:Personal:Leisure  24.90 CHF
+  Expenses:Family:Paola  54.80 CHF
+  Assets:CH:Cash
+
+2018-11-16 * "Mancava"
+  Assets:CH:Cash  350.00 CHF
+  Income:CH:Mancava-ACG  -70.00 CHF ;compreso contributo Vito
+  Income:CH:Mancava-ACG  -280.00 CHF ;utili 20 EUR al posto di 20 CHF
+  
+2018-11-17 * "Valdez"
+  Assets:IT:Cash  525.00 EUR
+  Income:Rent:Valdez  -500.00 EUR
+  Income:Rent:Canturina:Expenses
+
+2018-11-18 * "Mystic Burger"
+  Expenses:Food:Restaurant  19.50 EUR
+  Assets:IT:Cash
+
+2018-11-20 * "Aldi"
+  Expenses:Personal:Leisure  51.95 CHF
+  Assets:CH:Cash
+
+2018-11-20 * "benzina"
+  Expenses:Transport:Gasoline  17.00 CHF
+  Assets:CH:Cash
+
+2018-11-20 * "BPSsuisse"
+  Assets:CH:BPSSuisse:Checking  -2950.00 EUR
+  Assets:IT:Cash
+
+2018-11-20 * "Paola"
+  Expenses:Family:Paola  200.00 EUR
+  Assets:IT:Cash
+
+2018-11-19 * "Babitoo"
+  Expenses:Parents  5.00 EUR ;sblocco telefono
+  Assets:IT:Cash
+
+2018-11-21 * "resto Hoxha"
+  Expenses:Parents  6.00 EUR
+  Assets:IT:Cash
+
+2018-11-22 * "Aldi Italy"
+  Expenses:Personal:Leisure  9.99 EUR ;pantaloni ciclismo
+  Assets:IT:Cash
+
+2018-11-21 * "Bricoman"
+  Expenses:Personal:Leisure  81.72 EUR
+  Assets:IT:Cash
+
+2018-11-22 * "Aldi"
+  Expenses:Personal:Leisure  70.95 CHF ;pagati con anche 20.00 EUR
+  Assets:CH:Cash
+
+2018-11-22 * "rimborsi Aldi"
+  Assets:CH:Cash 44.89 CHF
+  Income:CH:Shopping:Reimbursement
+
+2018-11-23 * "Cena Opsa"
+  Expenses:Food:Restaurant  20.00 EUR
+  Assets:IT:Cash
+
+2018-11-24 * "Certificato Paola"
+  Expenses:Family:Paola  45.00 EUR
+  Assets:IT:Cash
+
+2018-11-24 * "rimborso lettore DVD"
+  Assets:IT:Cash  50.00 EUR ;comprensivo di resto Hoxha e Babitoo
+  Income:Parents:Reimbursement
+
+2018-11-24 * "Fuin"
+  Expenses:Personal:Leisure  7.10 EUR
+  Assets:IT:Cash
+
+2018-11-27 * "Paolo Bianchi"
+  Expenses:Home:Maintenance  210.00 EUR ;legna di Faggio
+  Assets:IT:Cash
+
+2018-11-26 * "Abramo"
+  Assets:IT:Cash  20.00 EUR
+  Income:Family:Reimbursement ;calendario Avvento
+
+2018-11-28 * "Fogliano"
+  Assets:IT:Cash  250.00 EUR
+  Income:Rent:LaDolceAlbate
+
+2018-11-29 * "benzina"
+  Expenses:Transport:Gasoline  5.00 EUR
+  Assets:IT:Cash
+
+2018-11-30 * "BPSsuisse"
+  Assets:CH:BPSSuisse:Checking  569.50 EUR ;estinzione
+  Assets:IT:Cash
+
+2018-11-30 * "Tasse Confederazione"
+  Expenses:CH:C4:Taxes  27.10 CHF
+  Assets:CH:Cash
+
+2018-11-30 * "benzina"
+  Expenses:Transport:Gasoline  12.05 EUR
+  Assets:IT:Cash
+
+2018-11-30 * "Aldi"
+  Expenses:Personal:Leisure  20.40 CHF
+  Assets:CH:Cash
+
+2018-12-02 * "Mum"
+  Assets:IT:Cash  500.00 EUR
+  Income:Parents:Donation
+
+2018-12-04 * "McDonald"
+  Expenses:Food:Restaurant  18.75 EUR
+  Assets:IT:Cash
+
+2018-12-04 * "presciistica"
+  Expenses:Personal:Leisure  35.00 EUR
+  Expenses:Family:Paola  35.00 EUR
+  Expenses:Family:Children  35.00 EUR
+  Assets:IT:Cash
+
+2018-12-05 * "biglietti bus"
+  Expenses:Family:Children  22.00 EUR
+  Assets:IT:Cash
+
+2018-12-05 * "Camera di Commercio"
+  Expenses:LonghiCostruzioni  200.00 ;chiusura
+  Assets:IT:Cash
+
+2018-12-05 * "Dotti"
+  Expenses:IT:Taxes:Consultant  400.00 EUR ;Paola 2015 e 16
+  Assets:IT:Cash
+
+2018-12-05 * "Portesan"
+  Assets:CH:Cash  5350.00 CHF ;affitto Splügen
+  Income:CH:Rent:Portesan
+
+2018-12-05 * "Aldi"
+  Expenses:Personal:Leisure  88.05 CHF
+  Assets:CH:Cash
+
+2018-12-05 * "papà"
+  Assets:IT:Cash  80.00 EUR
+  Income:Parents:Reimbursement ;fascia ginocchio
+
+2018-12-07 * "Paola"
+  Expenses:Family:Paola  40.00 EUR ;resto nella felpa di Abramo
+  Assets:IT:Cash
+
+2018-12-07 * "gasolio"
+  Expenses:Transport:Gasoline  50.00 EUR
+  Assets:IT:Cash
+
+2018-12-07 * "cena CRI"
+  Expenses:Personal:Leisure  45.00 EUR
+  Assets:IT:Cash
+
+2018-12-10 * "AcquaESapone"
+  Expenses:Albatre:Maintenance  8.80 EUR
+  Assets:IT:Cash
+
+2018-12-10 * "Munto"
+  Expenses:Personal:Leisure  10.40 EUR
+  Assets:IT:Cash
+
+2018-12-10 * "Aldi Italy"
+  Expenses:Personal:Leisure  18.98 EUR
+  Expenses:Food:Groceries
+  Assets:IT:Cash  28.26 EUR
+
+2018-12-11 * "dentista"
+  Expenses:Family:Health  200.00 EUR
+  Assets:IT:Cash
+
+2018-12-11 * "McDonald"
+  Expenses:Food:Restaurant  30.70 EUR
+  Assets:IT:Cash
+
+2018-12-14 * "benzina"
+  Expenses:Transport:Gasoline  18.00 CHF
+  Assets:CH:Cash
+
+2018-12-14 * "Tasse Splügen"
+  Expenses:CH:C4:Taxes  597.00 CHF
+  Assets:CH:Cash
+
+2018-12-14 * "Caldaia Nardelli"
+  Expenses:Parents:Maintenance  100.00 EUR
+  Assets:IT:Cash
+
+2018-12-15 * "Castiglioni"
+  Assets:IT:Cash  90.00 EUR ;box per 1.5 mesi fino a fine gennaio
+  Income:Rent:Castiglioni
+  
+2018-12-15 * "Aldi"
+  Expenses:Personal:Leisure  11.75 CHF
+  Assets:CH:Cash
+
+2018-12-16 * "Valdez"
+  Assets:IT:Cash  525.00 EUR
+  Income:Rent:Valdez  -500.00 EUR
+  Income:Rent:Canturina:Expenses
+
+2018-12-17 * "Marghe"
+  Expenses:Family:Children  20.00 EUR ;mancia per ritrovamento gioie
+  Assets:IT:Cash
+
+2018-12-18 * "Ciceri"
+  Assets:IT:Cash  575.00 EUR
+  Income:Rent:Ciceri  -550.00 EUR
+  Income:Rent:Canturina:Expenses
+
+2018-12-14 * "cena presciistica"
+  Expenses:Food:Restaurant  50.00 EUR
+  Assets:IT:Cash
+
+2018-12-19 * "Autotorino"
+  Expenses:Personal:Leisure  100.00 EUR ;anticipo Picanto
+  Assets:IT:Cash
+
+2018-12-20 * "Wheelup"
+  Expenses:Family:Children  103.10 EUR ;casco Ulisse e scaldacollo Marghe
+  Assets:IT:Cash
+
+2018-12-20 * "mamma"
+  Assets:IT:Cash  100.00 EUR
+  Income:Parents:Reimbursement
+
+2018-12-21 * "Autotorino"
+  Expenses:Personal:Leisure  2800.00 EUR
+  Assets:IT:Cash
+
+2018-12-22 * "Bajrami"
+  Assets:IT:Cash  2137.96 EUR
+  Income:Rent:Bajrami  -2000.00 EUR
+  Income:Rent:Albatre:Electricity  -33.12 EUR
+  Income:Rent:Albatre:Water  -104.84 EUR
+
+2018-12-21 * "Da Piero"
+  Expenses:Food:Restaurant  170.00 EUR ;regalo Abramo
+  Assets:IT:Cash
+
+2018-12-24 * "Aldi"
+  Expenses:Personal:Leisure  13.85 CHF
+  Assets:CH:Cash
+
+2018-12-24 * "Dubini"
+  Expenses:Personal:Leisure  22.00 CHF
+  Assets:CH:Cash
+
+2018-12-24 * "Consorzio Albese"
+  Expenses:Food:Groceries  17.43 EUR
+  Assets:IT:Cash
+
+2018-12-23 * "Paola"
+  Assets:IT:Cash  10.00 EUR ;rimborso parziale Iliad
+  Income:Family:Reimbursement
+
+2018-12-27 * "Fogliano"
+  Assets:IT:Cash  200.00 EUR
+  Income:Rent:LaDolceAlbate
+
+2018-12-26 * "Aldi Italy"
+  Expenses:Food:Groceries  13.12 EUR
+  Assets:IT:Cash
+
+2018-12-28 * "Abramo"
+  Assets:IT:Cash  135.00 EUR
+  Income:Family:Reimbursement
+
+2018-12-29 * "Aldi"
+  Expenses:Personal:Leisure  11.65 CHF
+  Assets:CH:Cash
+
+2018-12-29 * "benzina"
+  Expenses:Transport:Gasoline  16.00 CHF
+  Assets:CH:Cash
+
+2018-12-29 * "Migros"
+  Expenses:Personal:Leisure  20.80 CHF
+  Assets:CH:Cash
+
+2018-12-31 * "Lonesa"
+  Expenses:Personal:Leisure  21.10 CHF ;sigari
+  Assets:CH:Cash
+
+* 2019 
+** Bank transactions
+** Visa
+*** January
+2019-01-03 * "Wish"
+  Expenses:Personal:Leisure  2.00 EUR
+  Liabilities:IT:Visa
+
+2019-01-03 * "Google"
+  Expenses:Family:Children  6.99 EUR ;Minecraft Abramo
+  Liabilities:IT:Visa
+
+2019-01-06 * "Amazon Mktp"
+  Expenses:Family:Children  289.99 EUR ;Nintendo Ulisse
+  Liabilities:IT:Visa
+
+2019-01-09 * "Iliad"
+  Expenses:Family:Paola  7.99 EUR
+  Liabilities:IT:Visa
+
+2019-01-09 * "Amazon Mktp"
+  Expenses:Personal:Leisure  146.40 EUR
+  Liabilities:IT:Visa
+
+2019-01-09 * "Amazon Mktp"
+  Expenses:Personal:Leisure  15.99 EUR
+  Liabilities:IT:Visa
+
+2019-01-11 * "Kindle"
+  Expenses:Personal:Leisure  2.99 EUR
+  Liabilities:IT:Visa
+
+2019-01-11 * "Paypal"
+  Expenses:Personal:Leisure  39.04 EUR ;cura del corpo
+  Liabilities:IT:Visa
+
+2019-01-13 * "Iliad"
+  Expenses:Family:Children  7.99 EUR ;Abramo
+  Liabilities:IT:Visa
+
+2019-01-14 * "Wind"
+  Expenses:Personal:Leisure  12.00 EUR
+  Liabilities:IT:Visa
+
+2019-01-14 * "Amazon Mktp"
+  Expenses:Personal:Leisure  25.35 ;testine Oral B
+  Expenses:Family:Children ;giochi Nintendo
+  Liabilities:IT:Visa  -109.79 EUR
+
+** Transactions
+
+2019-01-03 * "Carnelli"
+  Assets:IT:Cash 1195.91 EUR
+  Income:Rent:Carnelli  -1100.00 EUR ;novembre e dicembre
+  Income:Rent:Canturina:Expenses  -60.00 EUR
+  Income:Rent:Canturina:Water  -35.91 EUR
+
+2019-01-03 * "Climaservice"
+  Expenses:Property:Maintenance  -115.50 EUR ;caldaia Carnelli
+  Assets:IT:Cash
+
+2019-01-04 * "Milli"
+  Assets:IT:Cash  350.00 EUR
+  Income:Rent:Milli
+
+2019-01-04 * "Cadenazzi"
+  Expenses:Canturina:Maintenance  700.00 EUR ;saldo finestre Ciceri
+  Assets:IT:Cash
+
+2019-01-03 * "Il Munto"
+  Expenses:Food:Restaurant  55.00 EUR
+  Assets:IT:Cash
+
+2019-01-04 * "Paola"
+  Expenses:Family:Paola  95.00 EUR ;scarpe palestra
+  Assets:IT:Cash
+
+2019-01-05 * "Bolla"
+  Expenses:Personal:Leisure  7.40 EUR
+  Assets:IT:Cash
+
+2019-01-05 * "Ulisse"
+  Assets:IT:Cash  290.00 EUR ;Nintendo Switch
+  Income:Family:Reimbursement
+
+2019-01-08 * "presciistica"
+  Expenses:Personal:Leisure  20.00 EUR
+  Expenses:Family:Paola  20.00 EUR
+  Expenses:Family:Children  20.00 EUR
+  Assets:IT:Cash
+  
+2019-01-09 * "Aldi"
+  Expenses:Personal:Leisure  39.90 CHF
+  Assets:CH:Cash
+
+2019-01-09 * "igienista"
+  Expenses:Personal:Health  180.00 CHF ;comprese 2 radiografie
+  Assets:CH:Cash
+
+2019-01-10 * "McDonald"
+  Expenses:Food:Restaurant  18.35 EUR
+  Assets:IT:Cash
+
+2019-01-10 * "Salandi"
+  Expenses:Family:Health  140.00 EUR ;psicoterapeuta
+  Assets:IT:Cash
+
+2019-01-11 * "Libori"
+  Assets:IT:Cash  450.00 EUR ;prima rata cauzione
+  Income:Rent:Deposit
+
+2019-01-11 * "Libori"
+  Assets:IT:Cash  450.00 EUR ;prima rata
+  Income:Rent:Libori
+
+2019-01-11 * "Montalbano"
+  Expenses:Family:Health  90.00 EUR ;Abramo
+  Assets:IT:Cash
+
+2019-01-11 * "gasolio"
+  Expenses:Transport:Gasoline  20.00 EUR
+  Assets:IT:Cash
+
+2019-01-12 * "Coop"
+  Expenses:Food:Groceries  12.28 EUR
+  Assets:IT:Cash
+
+2019-01-12 * "Ciceri"
+  Assets:IT:Cash  657.00 EUR
+  Income:Rent:Ciceri  600.00 EUR ;compreso garage
+  Income:Rent:Canturina:Expenses  25.00 EUR
+  Income:Rent:Canturina:Water
+
+2019-01-12 * "Abramo"
+  Assets:IT:Cash  25.00 EUR
+  Income:Family:Reimbursement
+
+2019-01-12 * "Giannina"
+  Assets:IT:Cash  450.00 EUR
+  Income:Parents:Donation
+
+2019-01-14 * "Bianco"
+  Assets:IT:Cash  500.00 EUR
+  Income:Rent:IlBoschetto
+
+2019-01-14 * "Ulisse"
+  Assets:IT:Cash  85.00 EUR ;giochi Nintendo
+  Income:Family:Reimbursement
+
+2019-01-15 * "MCM Adrara San martino"
+  Expenses:Transport:Toll  7.50 EUR
+  Expenses:Transport:Gasoline  11.50 EUR
+  Assets:IT:Cash
+
+2019-01-15 * "Paola"
+  Expenses:Family:Paola  200.00 EUR
+  Assets:IT:Cash
+
+2019-01-06 * "Valdez"
+  Assets:IT:Cash  525.00 EUR
+  Income:Rent:Valdez  -500.00 EUR
+  Income:Rent:Canturina:Expenses
+
+2019-01-18 * "Mancava"
+  Assets:CH:Cash  60.00 CHF
+  Income:CH:Mancava-ACG
+
+2019-01-18 * "rimborso Aldi"
+  Assets:CH:Cash  12.50 CHF ;maglione
+  Income:CH:Shopping:Reimbursement
+
+2019-01-19 * "gasolio"
+  Expenses:Transport:Gasoline  20.00 EUR
+  Assets:IT:Cash
+
+2019-01-20 * "Fuin"
+  Expenses:Personal:Leisure  8.00 EUR
+  Assets:IT:Cash
+
+2019-01-20 * "Munto"
+  Expenses:Personal:Leisure  10.50 EUR
+  Assets:IT:Cash
+
+2019-01-20 * "Aldi Italy"
+  Expenses:Food:Groceries  11.05 EUR
+  Expenses:Personal:Leisure
+  Assets:IT:Cash  -60.99 EUR
+
+2019-01-21 * "Consorzio Albese"
+  Expenses:Personal:Leisure  35.89 EUR ;materassino Agostino
+  Assets:IT:Cash
+
+2019-01-25 * "benzina"
+  Expenses:Transport:Gasoline  16.00 CHF
+  Assets:CH:Cash
+
+2019-01-25 * "Aldi"
+  Expenses:Personal:Leisure  11.25 CHF
+  Assets:CH:Cash
+
+2019-01-25 * "parrucchiere"
+  Expenses:Personal:Leisure  9.00 EUR
+  Assets:IT:Cash
+
+2019-01-27 * "trasferta a Pavia"
+  Expenses:Family:Paola  15.25 EUR ;gpl
+  Expenses:Transport:Toll  15.50 EUR
+  Expenses:Food:Restaurant  20.00 EUR ;McDonald
+  Expenses:Personal:Leisure  2.40 ;merenda
+  Assets:IT:Cash
+
+2019-01-29 * "Rimborso zia"
+  Assets:IT:Cash  285.00 EUR
+  Income:Albatre:Reimbursement
+
+2019-01-29 * "Fogliano"
+  Assets:IT:Cash  200.00 EUR
+  Income:Rent:LaDolceAlbate
+
+2019-01-30 * "Gasolio"
+  Expenses:Transport:Gasoline  30.00 EUR
+  Assets:IT:Cash
+
+2019-01-31 * "Aresu"
+  Expenses:Parents  950.00 EUR
+  Assets:IT:Cash
+
+2019-01-31 * "Montalbano"
+  Expenses:Family:Health  100.00 EUR ;Abramo
+  Assets:IT:Cash
+
+2019-01-31 * "Rimborso Paola"
+  Assets:IT:AccReceivable  26.00 EUR
+  Income:Family:Reimbursement
+
+2019-02-02 * "biglietti bus"
+  Expenses:Transport:Toll  13.00 EUR
+  Assets:IT:Cash
+
+2019-02-02 * "Top Gourmet"
+  Expenses:Food:Restaurant  10.00 EUR
+  Assets:IT:Cash
+
+2019-01-31 * "Testori"
+  Expenses:Canturina:Maintenance  30.00 EUR
+  Assets:IT:Cash
+
+2019-02-03 * "Munto"
+  Expenses:Personal:Leisure  9.00 EUR
+  Assets:IT:Cash
+
+2019-02-05 * "bolli"
+  Expenses:IT:Taxes:Bollo  20.00 EUR
+  Assets:IT:Cash
+
+2019-02-05 * "caldaia Libori"
+  Expenses:Property:Maintenance  190.00 EUR
+  Assets:IT:Cash
+
+2019-02-05 * "idraulico Libori"
+  Expenses:Property:Maintenance  60.00 EUR
+  Assets:IT:Cash
+
+2019-02-06 * "Paola"
+  Expenses:Family:Paola  200.00 EUR
+  Assets:IT:Cash
+
+2019-02-06 * "Carnelli scheda bruciatore"
+  Expenses:Property:Maintenance  150.00 EUR
+  Assets:IT:Cash
+
+2019-02-06 * "Castiglioni"
+  Income:Rent:Castiglioni  60.00 EUR
+  Assets:IT:Cash
+
+2019-02-06 * "Abramo"
+  Expenses:Family:Children  20.00 EUR ;gita
+  Assets:IT:Cash
+
+2019-02-08 * "presciistica"
+  Expenses:Personal:Leisure  20.00 EUR
+  Expenses:Family:Children  20.00 EUR
+  Expenses:Family:Paola  20.00 EUR
+  Assets:IT:Cash
+
+2019-02-09 * "McDonald"
+  Expenses:Food:Restaurant  32.00 EUR
+  Assets:IT:Cash
+
+2019-02-12 * "Dentista"
+  Expenses:Family:Health  150.00 EUR
+  Assets:IT:Cash
+
+2019-02-05 * "Feim"
+  Expenses:Property:Maintenance  50.00 EUR ;interruttore Libori, deve resto di 10
+  Assets:IT:Cash
+
+2019-02-12 * "Hoxha"
+  Assets:IT:Cash  960.00 EUR ;rimborso boiler gas + 10 pulizia
+  Income:Parents:Reimbursement
+
+2019-02-13 * "Tasse Splügen"
+  Expenses:CH:C4:Taxes  795.00 CHF ;comune
+  Expenses:CH:C4:Taxes  196.50 CHF ;Cantone
+  Expenses:CH:C4:Taxes  196.50 CHF ;Cantone
+  Expenses:CH:C4:Utilities  245.05 CHF ;elettricità 2018
+  Assets:CH:Cash
+
+2019-02-13 * "Aldi"
+  Expenses:Personal:Leisure  20.65 CHF
+  Assets:CH:Cash
+
+2019-02-13 * "Dhimiter rimborso pulizia"
+  Assets:IT:Cash  10.00 EUR
+  Income:Albatre:Reimbursement
+
+2019-02-15 * "gpl"
+  Expenses:Family:Paola  15.40 EUR
+  Assets:IT:Cash
+
+2019-02-15 * "Paola"
+  Assets:IT:AccReceivable  15.40 EUR ;gpl
+  Income:Family:Reimbursement
+
+2019-02-15 * "Ciceri"
+  Assets:IT:Cash  625.00 EUR
+  Income:Rent:Ciceri  -600.00 EUR ;compreso box
+  Income:Rent:Canturina:Expenses  -25.00 EUR
+  
+ 2019-02-15 * "Marghe"
+  Assets:IT:Cash  147.00 EUR ;J4+ + cover
+  Income:Family:Reimbursement
+

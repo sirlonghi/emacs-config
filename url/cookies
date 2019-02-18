@@ -2,13 +2,16 @@
 ;; Automatically generated file!!! DO NOT EDIT!!!
 
 (setq url-cookie-storage
- 'nil)
-(setq url-cookie-secure-storage
- '((".wikipedia.org"
-  [url-cookie "WMF-Last-Access-Global" "22-Aug-2018" "Sun, 23 Sep 2018 12:00:00 GMT" "/" ".wikipedia.org" t])
- ("en.wikipedia.org"
-  [url-cookie "WMF-Last-Access" "22-Aug-2018" "Sun, 23 Sep 2018 12:00:00 GMT" "/" "en.wikipedia.org" t]))
+ '((".allrecipes.com"
+  [url-cookie "FirstImpression" "False" "Mon, 18-Feb-2019 17:27:37 GMT" "/" ".allrecipes.com" nil]
+  [url-cookie "ARSiteUser" "1-8a32e9cd-974e-4a37-afc2-63d1b86c11b4" "Wed, 12-Feb-2020 03:01:20 GMT" "/" ".allrecipes.com" nil]
+  [url-cookie "ARToken" "84XAr4Z2Z57+ieH6qwuIrVUPQ7gkDnwfjx39OvSvfOEtJYTiXU3qJBbH2lPyN25d9aEFrqRRcMG0lIESgZOv7S/tGaPZoRkYB9Cmfj6b7bRtMwlGnQDoeG0ZDyGeShqlm3BPKBPBX7DNyqPnXkxgGw7htF1OGCOKtlaUx2ss5cPPmetc92nQfQ==" "Mon, 18-Feb-2019 17:27:37 GMT" "/" ".allrecipes.com" nil]
+  [url-cookie "LastViewedRecipes" "228293" "Fri, 31-Dec-9999 00:00:00 GMT" "/" ".allrecipes.com" nil]
+  [url-cookie "LVInferredTastePrefs" "in,ch,wo,g" "Fri, 31-Dec-9999 00:00:00 GMT" "/" ".allrecipes.com" nil]
+  [url-cookie "euConsent" "false" "Fri, 31-Dec-9999 00:00:00 GMT" "/" ".allrecipes.com" nil]))
 )
+(setq url-cookie-secure-storage
+ 'nil)
 
 ;; Local Variables:
 ;; version-control: never

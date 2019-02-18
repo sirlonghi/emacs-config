@@ -61,37 +61,8 @@ Per una valutazione più cautelativa è generalmente opportuno tener conto del
    :PROPERTIES:
    :header-args: :exports both
    :END:
-*** Trave di bordo
-Stima peso proprio PTB (kg/m)
-#+NAME: PTB
-#+BEGIN_SRC calc
-2500*((0.50*0.75)-(0.20*0.50))
-#+END_SRC
 
-#+RESULTS: PTB
-: 687.5
-
-*** Trave centrale
-Stima peso proprio PTC (kg/m)
-#+NAME: PTC
-#+BEGIN_SRC calc
-2500*((0.90*0.75)-(0.40*0.50))
-#+END_SRC
-
-#+RESULTS: PTC
-: 1187.5
-
-*** Tegolo di copertura 
-- Stima peso proprio PTG (kg/m^2)
-#+NAME: PTG
-#+BEGIN_SRC calc 
-2500*((2.40*0.50)-(2.20*0.30))/2.40
-#+END_SRC
-
-#+RESULTS: PTG
-: 562.5
-
-- Carico di neve CN (kg/m^2)
+*** Carico di neve CN (kg/m^2)
 #+NAME: CN
 #+BEGIN_SRC calc 
 140
@@ -100,7 +71,43 @@ Stima peso proprio PTC (kg/m)
 #+RESULTS: CN
 : 140
 
-- Carico trasmesso da tegolo su trave CTG
+*** Stima peso proprio tegolo di copertura PTG (kg/m^2) 
+#+NAME: PTG
+#+BEGIN_SRC calc 
+2500*((2.40*0.50)-(2.20*0.30))/2.40
+#+END_SRC
+
+#+RESULTS: PTG
+: 562.5
+
+*** Stima peso proprio trave di bordo ad L (kg/m)
+#+NAME: PTB
+#+BEGIN_SRC calc
+2500*((0.50*0.75)-(0.20*0.50))
+#+END_SRC
+
+#+RESULTS: PTB
+: 687.5
+
+*** Stima peso proprio trave centrale a T rovescia PTC (kg/m)
+#+NAME: PTC
+#+BEGIN_SRC calc
+2500*((0.90*0.75)-(0.40*0.50))
+#+END_SRC
+
+#+RESULTS: PTC
+: 1187.5
+
+*** Stima peso proprio pannello di tamponamento (kg)
+#+NAME: PPN
+#+BEGIN_SRC calc :var Lx=8.00 H=5.20 S=0.20
+2500*S*Lx*H
+#+END_SRC
+
+#+RESULTS: PPN
+: 20800.
+
+*** Carico trasmesso da tegolo su trave CTG (kg)
 #+NAME: CTG
 #+BEGIN_SRC calc :var CN=CN :var PTG=PTG  
 ((1.3*PTG + 1.5*CN) * 12.50/2) * 2.40
@@ -109,7 +116,7 @@ Stima peso proprio PTC (kg/m)
 #+RESULTS: CTG
 : 14118.75
 
-- Carico trasmesso da trave di bordo su pilastro CTB
+*** Carico trasmesso da trave di bordo su pilastro CTB (kg)
 #+NAME: CTB
 #+BEGIN_SRC calc :var CN=CN :var PTG=PTG :var PTB=PTB :var LY=8
 ((1.3*PTG + 1.5*CN) * (12.50/2) * (LY/2)) + (1.3*PTB * LY/2)
@@ -118,7 +125,7 @@ Stima peso proprio PTC (kg/m)
 #+RESULTS: CTB
 : 27106.25
 
-- Carico trasmesso da trave centrale su pilastro CTC
+*** Carico trasmesso da trave centrale su pilastro CTC (kg)
 #+NAME: CTC
 #+BEGIN_SRC calc :var CN=CN :var PTG=PTG :var PTC=PTC :var LY=8
 ((1.3*PTG + 1.5*CN) * (12.50) * (LY/2)) + (1.3*PTC * LY/2)
@@ -126,3 +133,4 @@ Stima peso proprio PTC (kg/m)
 
 #+RESULTS: CTC
 : 53237.5
+

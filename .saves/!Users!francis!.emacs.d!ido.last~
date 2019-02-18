@@ -2,15 +2,15 @@
 
 ;; ----- ido-last-directory-list -----
 (
+ ("/Users/francis/.emacs.d/" . "auto-save-list/")
  ("/Users/francis/Dropbox/cloudOrg/" . "francis_accounting/")
- ("/Users/francis/Dropbox/Current_Project/" . "MCM/")
- ("/Users/francis/Dropbox/" . "Current_Project/")
- ("/Users/francis/" . "Dropbox/")
+ ("/Users/francis/Dropbox/Current_Project/" . "Fuoco/")
+ ("/Users/francis/Dropbox/" . "cloudOrg/")
+ ("/Users/francis/" . ".emacs.d/")
 )
 
 ;; ----- ido-work-directory-list -----
 (
- "/Users/francis/Dropbox/Current_Project/MCM/"
  "/Users/francis/.emacs.d/"
  "/Users/francis/Dropbox/cloudOrg/francis_accounting/"
  "/Users/francis/"
@@ -20,36 +20,36 @@
 
 ;; ----- ido-work-file-list -----
 (
- "Relazione.org"
+ "my-packages.el"
+ "my-loadpackages.el"
  "init.el"
+ "Ledger.beancount"
+ "init-old.el"
  "francis2018.beancount.gpg"
  ".authinfo.gpg"
- "init-old.el"
  "help.org"
  "CalcoloAnalitico.org"
  "francis_gtd.org"
- "Work.org"
- "CRI.org"
 )
 
 ;; ----- ido-dir-file-cache -----
 (
- ("/Users/francis/Dropbox/Current_Project/MCM/" (23635 28951 0 0) "SW/" "Risorse/" "Relazione.tex" "Relazione.pdf" "Relazione.org" "Relazione.odt" "MCM_Intervento.pln" "MCM_Capannone/" "MCM-Testi/" "MCM-Foto/" "MCM-Cad/" "ltxpng/" ".DS_Store" "../" "./")
+ ("/Users/francis/.emacs.d/" (23656 34617 0 0) "url/" "themes/" "snippets/" "network-security.data" "my-packages.el" "my-loadpackages.el" "init.el" "init-old.el" "ido.last" "elpa/" "custom/" "bookmarks" "auto-save-list/" ".saves/" ".org-id-locations" ".gitignore" ".git/" ".DS_Store" "#init-old.el#" "../" "./")
 
- ("/Users/francis/Dropbox/Current_Project/" (23634 46458 0 0) "Sap2000.v20.2.0_64bit/" "RocketMassHeater/" "ProSap/" "Plan.html" "Pebble/" "PatenteNautica/" "OpenStudio.md" "MCM/" "kg_Sap2000 v20/" "Illuminati/" "GMM/" "Fuoco/" "Energy/" "DB_Exports/" "CRI/" "Casa/" "Albatre_copertura/" ".DS_Store" "../" "./")
+ ("/Users/francis/Dropbox/cloudOrg/" (23656 34498 0 0) "Work.org" "tj-tut.tjp" "ss.org.gpg" "Splugen.org~" "Splugen.org" "scripts/" "Scan/" "refile.org~" "refile.org" "projects/" "project-planning.org" "P_Documents/" "orgmode.org~" "orgmode.org" "MobileOrg/" "icons/" "help.org" "Health/" "Getting Started with Orgzly.org" "francis_gtd.org~" "francis_gtd.org" "francis_accounting/" "diary.org" "data/" "dailyPlan.org" "css/" "CRI.org~" "CRI.org" "cookbook.org" "contacts.org" "ContactList.html" "attachments/" "archive-pro.org" "archive-pers.org~" "archive-pers.org" ".Rhistory" ".RData" ".projectile" ".DS_Store" ".diary" "../" "./")
 
- ("/Users/francis/Dropbox/" (23637 54348 0 0) "Wiki/" "test-site/" "tech/" "Screenshot/" "Old_Projects/" "Icon
+ ("/Users/francis/.emacs.d/auto-save-list/" (23656 24288 0 0) ".saves-1421-macbook-pro-di-francesco-longhi.local~" ".saves-1101-macbook-pro-di-francesco-longhi.local~" "../" "./")
+
+ ("/Users/francis/Dropbox/cloudOrg/francis_accounting/" (23656 19869 0 0) "visa_import.beancount" "visa2beancount.org" "Taxes/" "Rent/" "Pedroncelli.beancount.gpg" "Oldies/" "Nexi/" "Listino.org.gpg" "Ledger.beancount" "francis2018.beancount.gpg" "francis.beancount.gpg" "Exports/" "Contabilita_Zanfrini.ods" "Contabilita_Inquilini.ods" "beancountApp/" "Bank_Statements/" "bank_import.beancount" "bank2beancount.org" "abramo.beancount.org" ".Rhistory" ".RData" ".DS_Store" "../" "./")
+
+ ("/Users/francis/" (23653 57975 0 0) "VirtualBox VMs/" "texput.log" "Sites/" "Public/" "Pictures/" "OpenStudio/" "NetBeansProjects/" "Music/" "Movies/" "Mail/" "log4j.log" "Library/" "Dropbox/" "Downloads/" "Documents/" "Desktop/" "custom.el" "BCL/" "Applications/" ".viminfo" ".Trash/" ".subversion/" ".spacemacs_old" ".spacemacs.d/" ".spacemacs" ".slime-history.eld" ".slime/" ".rstudio-desktop/" ".Rhistory" ".rbenv/" ".Rapp.history" ".python_history" ".oracle_jre_usage/" ".offlineimaprc~" ".offlineimaprc" ".offlineimap/" ".mu/" ".matplotlib/" ".local/" ".jupyter/" ".ipython/" ".insert-shebang.log" ".gnupg/" ".gitconfig" ".gemrc" ".gem/" ".emacs~" ".emacs.d.bak/" ".emacs.d/" ".emacs.bak" ".DS_Store" ".dropbox/" ".cups/" ".config/" ".CFUserTextEncoding" ".cened2C/" ".cened2/" ".cache/" ".bean-shell-history" ".bash_sessions/" ".bash_profile" ".bash_history" ".authinfo.gpg" "../" "./")
+
+ ("/Users/francis/Dropbox/" (23637 54347 0 0) "Wiki/" "test-site/" "tech/" "Screenshot/" "Old_Projects/" "Icon
 " "Getting Started.pdf" "File inviati/" "Engineering/" "Dbase/" "Current_Project/" "cloudOrg/" "Books/" "bbdb" ".DS_Store" ".dropbox.cache/" ".dropbox" "../" "./")
 
- ("/Users/francis/.emacs.d/" (23640 17674 0 0) "url/" "themes/" "snippets/" "network-security.data" "my-packages.el" "my-loadpackages.el" "init.el" "init-old.el" "ido.last" "elpa/" "custom/" "bookmarks" "auto-save-list/" ".saves/" ".org-id-locations" ".gitignore" ".git/" ".DS_Store" "#init-old.el#" "../" "./")
-
- ("/Users/francis/Dropbox/cloudOrg/francis_accounting/" (23639 3823 0 0) "visa_import.beancount" "visa2beancount.org" "Taxes/" "Rent/" "Pedroncelli.beancount.gpg" "Oldies/" "Nexi/" "Listino.org.gpg" "francis2018.beancount.gpg~" "francis2018.beancount.gpg" "francis.beancount.gpg" "Exports/" "Contabilita_Zanfrini.ods" "Contabilita_Inquilini.ods" "beancountApp/" "Bank_Statements/" "bank_import.beancount" "bank2beancount.org" "abramo.beancount.org" ".Rhistory" ".RData" ".DS_Store" "../" "./")
-
- ("/Users/francis/Dropbox/cloudOrg/" (23636 42848 0 0) "Work.org" "tj-tut.tjp" "ss.org.gpg" "Splugen.org~" "Splugen.org" "scripts/" "Scan/" "refile.org~" "refile.org" "projects/" "project-planning.org" "P_Documents/" "orgmode.org~" "orgmode.org" "MobileOrg/" "icons/" "help.org" "Health/" "Getting Started with Orgzly.org" "francis_gtd.org~" "francis_gtd.org" "francis_accounting/" "diary.org" "data/" "dailyPlan.org" "css/" "CRI.org~" "CRI.org" "contacts.org" "ContactList.html" "attachments/" "archive-pro.org" "archive-pers.org~" "archive-pers.org" ".Rhistory" ".RData" ".projectile" ".DS_Store" ".diary" "../" "./")
-
- ("/Users/francis/" (23638 1820 0 0) "VirtualBox VMs/" "texput.log" "Sites/" "Public/" "Pictures/" "OpenStudio/" "NetBeansProjects/" "Music/" "Movies/" "Mail/" "log4j.log" "Library/" "Dropbox/" "Downloads/" "Documents/" "Desktop/" "custom.el" "BCL/" "Applications/" ".Trash/" ".subversion/" ".spacemacs_old" ".spacemacs.d/" ".spacemacs" ".slime-history.eld" ".slime/" ".rstudio-desktop/" ".Rhistory" ".rbenv/" ".Rapp.history" ".python_history" ".oracle_jre_usage/" ".offlineimaprc~" ".offlineimaprc" ".offlineimap/" ".mu/" ".matplotlib/" ".local/" ".jupyter/" ".ipython/" ".insert-shebang.log" ".gnupg/" ".gitconfig" ".gemrc" ".gem/" ".emacs~" ".emacs.d.bak/" ".emacs.d/" ".emacs.bak" ".DS_Store" ".dropbox/" ".cups/" ".config/" ".condarc" ".conda/" ".CFUserTextEncoding" ".cened2C/" ".cened2/" ".cache/" ".bean-shell-history" ".bash_sessions/" ".bash_profile-anaconda3.bak" ".bash_profile" ".bash_history" ".authinfo.gpg" ".anaconda/" "../" "./")
-
  ("/Users/francis/Dropbox/Current_Project/Fuoco/" (23633 29325 0 0) "WhatsApp Image 2019-01-16 at 17.25.42.jpeg" "WhatsApp Image 2019-01-16 at 17.25.42 (2).jpeg" "WhatsApp Image 2019-01-16 at 17.25.42 (1).jpeg" "TDS_IT(IT)_Protherm-Steel_4268-a.pdf" "Scheda tecnica_Amotherm-Steel-Primer-WB.pdf" "RelazioneFuoco.docx" "protherm-it.pdf" "Protezione_fuoco_acciaio.pdf" "Pitturazione REI - Vano Scala D.pdf" "Pictures/" "nomogramma_R.png" "nomogramma.pdf" "Materiale_27_02_2014_Biffarella-NEW.pdf" "EX818_SEZIONICA.pdf" "CalcoloAnalitico.org" "CalcoloAnalitico.odt" "CalcoloAnalitico.docx" "analisi-comportamento-intumescenti-profili-acciaio.pdf" "../" "./")
+
+ ("/Users/francis/Dropbox/Current_Project/" (23626 6615 0 0) "RocketMassHeater/" "ProSap/" "Plan.html" "Pebble/" "PatenteNautica/" "OpenStudio.md" "MCM/" "Illuminati/" "GMM/" "Fuoco/" "Energy/" "DB_Exports/" "CRI/" "Casa/" "Albatre_copertura/" ".DS_Store" "../" "./")
 
  ("/Users/francis/.dropbox/" (23233 3805 0 0) "unlink.db" "QuitReports/" "machine_storage/" "logs/" "instance_db/" "instance1/" "info.json" "host.db" "events/" "dropbox.pid" "Crashpad/" "../" "./")
 )

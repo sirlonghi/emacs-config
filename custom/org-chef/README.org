@@ -1,0 +1,113 @@
+[[./img/org-chef.png]]
+
+* Introduction
+
+  org-chef is a package for managing recipes in org-mode. One of the
+  main features is that it can automatically extract recipes from
+  websites like allrecipes.com
+
+* Installation
+
+  org-chef is available on MELPA!
+
+  I manage my packages via [[https://github.com/jwiegley/use-package][use-package]]. I have added this to my
+  ~.emacs~ file to install org-chef:
+
+  #+BEGIN_SRC elisp
+    (require 'package)
+    (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+
+    (require 'use-package)
+
+    (use-package org-chef
+      :ensure t)
+  #+END_SRC
+
+* Org-Capture
+
+  It's recommended that you set up an org-capture template to capture
+  recipes. Here is an example of that:
+
+  #+BEGIN_SRC lisp
+    (setq org-capture-templates
+          '(("c" "Cookbook" entry (file "~/org/cookbook.org")
+             "%(org-chef-get-recipe-from-url)"
+             :empty-lines 1)
+            ("m" "Manual Cookbook" entry (file "~/org/cookbook.org")
+             "* %^{Recipe title: }\n  :PROPERTIES:\n  :source-url:\n  :servings:\n  :prep-time:\n  :cook-time:\n  :ready-in:\n  :END:\n** Ingredients\n   %?\n** Directions\n\n")))
+  #+END_SRC
+
+  When capturing to the cookbook it will prompt you for a URL, you can
+  then paste a URL like the following into the mini-buffer, and it
+  will fill in as many details as it can. Here is an example recipe:
+
+  http://allrecipes.com/recipe/85452/homemade-black-bean-veggie-burgers/
+
+  Which will be extracted to something like the following:
+
+  #+BEGIN_SRC org
+    ,* Homemade Black Bean Veggie Burgers
+      :PROPERTIES:
+      :source-url: https://www.allrecipes.com/recipe/85452/homemade-black-bean-veggie-burgers/
+      :servings: 4
+      :prep-time: 15  m
+      :cook-time: 20  m
+      :ready-in: 35  m
+      :END:
+    ,** Ingredients
+
+       - 1 (16 ounce) can black beans, drained and rinsed
+       - 1/2 green bell pepper, cut into 2 inch pieces
+       - 1/2 onion, cut into wedges
+       - 3 cloves garlic, peeled
+       - 1 egg
+       - 1 tablespoon chili powder
+       - 1 tablespoon cumin
+       - 1 teaspoon Thai chili sauce or hot sauce
+       - 1/2 cup bread crumbs
+    ,** Directions
+
+       1. If grilling, preheat an outdoor grill for high heat, and lightly oil a sheet of aluminum foil. If baking, preheat oven to 375 degrees F (190 degrees C), and lightly oil a baking sheet.
+       2. In a medium bowl, mash black beans with a fork until thick and pasty.
+       3. In a food processor, finely chop bell pepper, onion, and garlic. Then stir into mashed beans.
+       4. In a small bowl, stir together egg, chili powder, cumin, and chili sauce.
+       5. Stir the egg mixture into the mashed beans. Mix in bread crumbs until the mixture is sticky and holds together. Divide mixture into four patties.
+       6. If grilling, place patties on foil, and grill about 8 minutes on each side. If baking, place patties on baking sheet, and bake about 10 minutes on each side.
+  #+END_SRC
+
+  Additionally there is a capture template in there for manually
+  entering a recipe, if you so desire!
+
+* Inserting at Point
+
+  You can also insert a recipe at point using the command
+  ~org-chef-insert-recipe~.
+
+* Supported Sites
+
+  The following websites should support recipe extraction:
+
+  - http://allrecipes.com/
+  - http://www.geniuskitchen.com/
+  - https://www.simplyrecipes.com/
+  - https://www.marthastewart.com/
+  - https://www.budgetbytes.com/
+  - https://www.culturesforhealth.com/
+  - https://www.seriouseats.com/
+  - http://www.marmiton.org/ (french)
+  - https://www.reluctantgourmet.com/
+  - https://www.chefkoch.de/
+  - https://steamykitchen.com/
+  - https://showmetheyummy.com/
+  - https://nytimes.com/
+  - Any recipe site based on wordpress
+
+* Contributing
+
+  Contributions are very welcome! Feel free to open pull requests and
+  issues (and feel free to include a recipe that you like in it!)
+
+  If you find a site that you like that doesn't currently work with
+  org-chef, then you should definitely let us know through a GitHub
+  issue! Org-chef's goal is to support as many sites as possible, so
+  missing websites are considered bugs!

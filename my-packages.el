@@ -6,6 +6,7 @@
              '("melpa" . "http://melpa.milkbox.net/packages/") t)
 (add-to-list 'package-archives
              '("marmalade" . "http://marmalade-repo.org/packages/") t)
+;;(require 'use-package)
 (package-initialize)
 
 ;; defvar is the correct way to declare global variables
@@ -17,6 +18,8 @@
     yasnippet
     evil
     zenburn-theme
+    org-chef
+    helm
   ) "a list of packages to ensure are installed at launch.")
 
 ; method to check if all packages are installed
