@@ -1,5 +1,8 @@
 ;; -*- coding: utf-8; lexical-binding: t; -*-
 
+;; Start server
+(server-start)
+
 ;;----------------------------------------------------------------------------
 ;; Which functionality to enable (use t or nil for true and false)
 ;;----------------------------------------------------------------------------
@@ -16,8 +19,9 @@
 (global-visual-line-mode t)
 
 ;; Mac keys (italian layout)
-(setq mac-command-modifier 'meta)
-(setq mac-option-modifier nil)
+(when *is-a-mac*
+  (setq mac-command-modifier 'meta)
+  (setq mac-option-modifier nil))
 
 ;; change all prompts to y or n
 (fset 'yes-or-no-p 'y-or-n-p)
@@ -108,10 +112,14 @@
               ("M" "Manual Cookbook" entry (file "~/Dropbox/cloudOrg/cookbook.org")
                "* %^{Recipe title: }\n  :PROPERTIES:\n  :source-url:\n  :servings:\n  :prep-time:\n  :cook-time:\n  :ready-in:\n  :END:\n** Ingredients\n   %?\n** Directions\n\n"))))
 
+;; set org directory
+(setq org-dir "~/Dropbox/cloudOrg")
+
+
 ;; Set which files must be visible on agenda
-(setq org-agenda-files (list "~/Dropbox/cloudOrg/Work.org"
-			     "~/Dropbox/cloudOrg/orgmode.org"
-			     "~/Dropbox/cloudOrg/francis_gtd.org"))
+(setq org-agenda-files (list (concat org-dir "/Work/work.org")
+			     (concat org-dir "/orgmode.org")
+                             (concat org-dir "/Personal/francis_gtd.org")))
 
 ;; template for code source blocks
 ;; type '<s' followed by TAB to insert the snippet and position cursor after #+NAME: 
