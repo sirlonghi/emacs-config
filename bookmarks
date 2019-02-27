@@ -3,10 +3,10 @@
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
 (("org-capture-last-stored"
- (filename . "~/Dropbox/cloudOrg/cookbook.org")
- (front-context-string . "* Pollo tikka ma")
- (rear-context-string . "o per 5 minuti.\n")
- (position . 799))
+ (filename . "~/Dropbox/cloud-org/personal/francis_gtd.org")
+ (front-context-string . "** TODO \n [2019-")
+ (rear-context-string . "7_figli]]\n* GTD\n")
+ (position . 45127))
 ("org-refile-last-stored"
  (filename . "~/Dropbox/cloudOrg/francis_gtd.org")
  (front-context-string . "** NEXT Weekly r")

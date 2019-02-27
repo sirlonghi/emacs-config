@@ -79,6 +79,27 @@
 (setq org-clock-into-drawer "CLOCKING")
 (setq org-log-into-drawer "LOGBOOK")
 
+;; set org directories
+(setq org-dir "~/Dropbox/cloud-org")
+(setq work-org-dir (concat org-dir "/work"))
+(setq tech-org-dir (concat org-dir "/tech"))
+(setq pers-org-dir (concat org-dir "/personal"))
+
+;; set org files
+;; inbox
+(setq my-inbox (concat org-dir "/refile.org"))
+;; GTD
+(setq my-gtd (concat pers-org-dir "/francis_gtd.org"))
+;; work
+(setq my-work (concat work-org-dir "/work.org"))
+;; recipes
+(setq my-recipes (concat pers-org-dir "/cookbook.org"))
+
+;; Set which files must be visible on agenda
+(setq org-agenda-files (list (concat org-dir "/work/work.org")
+			                       (concat org-dir "/personal/orgmode.org")
+                             (concat org-dir "/personal/francis_gtd.org")))
+
 ;; Capture templates for: TODO tasks, Notes, appointments, phone calls, meetings, and org-protocol
 ;; %a          annotation, normally the link created with org-store-link
 ;; %i          initial content, the region when capture is called with C-u.
@@ -86,40 +107,30 @@
 ;; %u, %U      like above, but inactive timestamps
 ;; %?          After completing the template, position cursor here.
 
-
 (setq org-capture-templates
-      (quote (("t" "todo" entry (file+headline "~/Dropbox/cloudOrg/orgmode.org" "GTD")
+      (quote (("t" "todo" entry (file+headline my-gtd "GTD")
                "* TODO %?\n%U\n")
-              ("r" "reply" entry (file+headline "~/Dropbox/cloudOrg/orgmode.org" "GTD")
+              ("r" "reply" entry (file+headline my-gtd "GTD")
                "* NEXT Mail reply to %:from on %:subject\nEntered on %U\nSCHEDULED: %^t")
-              ("n" "note" entry (file+headline "~/Dropbox/cloudOrg/orgmode.org" "Notes")
+              ("n" "note" entry (file+headline my-gtd "Notes")
                "* %? :NOTE:\nEntered on %U\n")
-              ("j" "Journal" entry (file+olp+datetree "~/Dropbox/cloudOrg/diary.org")
+              ("j" "Journal" entry (file+olp+datetree my-gtd)
                "* %?\nEntered on %U\n")
-              ("m" "Meeting" entry (file+headline "~/Dropbox/cloudOrg/orgmode.org" "GTD")
+              ("m" "Meeting" entry (file+headline my-gtd "GTD")
                "* MEETING with %? :MEETING:\nEntered on %U\nSCHEDULED: %^T")
-              ("p" "Phone call" entry (file+headline "~/Dropbox/cloudOrg/orgmode.org" "GTD")
+              ("p" "Phone call" entry (file+headline my-gtd "GTD")
                "* PHONE %? :PHONE:\nEntered on %U\n")
-	      ("w" "org-protocol" entry (file "~/Dropbox/cloudOrg/refile.org")
+	      ("w" "org-protocol" entry (file my-inbox)
                "* TODO Review %c\nEntered on %U\n")
-	      ("c" "Rescue mission" entry (file+headline "~/Dropbox/cloudOrg/CRI.org" "Missions") "* Mission %^{CODE}p  %^{DIAGNOSIS}p %^{BRIEFING}p\n Entered on %T\n")
-              ("h" "Habit" entry (file+headline "~/Dropbox/cloudOrg/orgmode.org" "Habits")
-               "* NEXT %?\nEntered on %U\nSCHEDULED: %(format-time-string \"%<<%Y-%m-%d %a .+1d/3d>>\")\n:PROPERTIES:\n:STYLE: habit\n:REPEAT_TO_STATE: NEXT\n:END:\n")
+;;	      ("c" "Rescue mission" entry (file+headline "~/Dropbox/cloudOrg/CRI.org" "Missions") "* Mission %^{CODE}p  %^{DIAGNOSIS}p %^{BRIEFING}p\n Entered on %T\n")
+;;              ("h" "Habit" entry (file+headline "~/Dropbox/cloudOrg/orgmode.org" "Habits")
+;;               "* NEXT %?\nEntered on %U\nSCHEDULED: %(format-time-string \"%<<%Y-%m-%d %a .+1d/3d>>\")\n:PROPERTIES:\n:STYLE: habit\n:REPEAT_TO_STATE: NEXT\n:END:\n")
               ;; org-chef
-              ("C" "Cookbook" entry (file "~/Dropbox/cloudOrg/cookbook.org")
+              ("C" "Cookbook" entry (file my-recipes)
                "%(org-chef-get-recipe-from-url)"
                :empty-lines 1)
-              ("M" "Manual Cookbook" entry (file "~/Dropbox/cloudOrg/cookbook.org")
+              ("M" "Manual Cookbook" entry (file my-recipes)
                "* %^{Recipe title: }\n  :PROPERTIES:\n  :source-url:\n  :servings:\n  :prep-time:\n  :cook-time:\n  :ready-in:\n  :END:\n** Ingredients\n   %?\n** Directions\n\n"))))
-
-;; set org directory
-(setq org-dir "~/Dropbox/cloudOrg")
-
-
-;; Set which files must be visible on agenda
-(setq org-agenda-files (list (concat org-dir "/Work/work.org")
-			     (concat org-dir "/orgmode.org")
-                             (concat org-dir "/Personal/francis_gtd.org")))
 
 ;; template for code source blocks
 ;; type '<s' followed by TAB to insert the snippet and position cursor after #+NAME: 
