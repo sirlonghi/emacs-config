@@ -68,11 +68,40 @@
                     TeX-run-command t t :help "Run xelatex") t))
 
 ;; ;; koma-letter
-;; (add-to-list 'auto-mode-alist '("\\.lco" . tex-mode))
-;; (eval-after-load 'ox '(require 'ox-koma-letter))
+;; find correct path to pdflatex
+(setenv "PATH" (concat (getenv "PATH") ":/Library/TeX/texbin"))
 
-;; (eval-after-load 'ox-latex
-;;   '(add-to-list 'org-latex-packages-alist '("AUTO" "babel" t) t))
+;; set typesetting engine
+;; Run xelatex multiple times to get the cross-references right
+            (setq org-latex-pdf-process '("xelatex -shell-escape %f"
+                                          "xelatex -shell-escape %f"
+                                          "xelatex -shell-escape %f"))
+
+;; (add-to-list 'load-path "~/.emacs.d/custom")
+(add-to-list 'auto-mode-alist '("\\.lco" . tex-mode))
+(eval-after-load 'ox '(require 'ox-koma-letter))
+
+(eval-after-load 'ox-latex
+  '(add-to-list 'org-latex-packages-alist '("AUTO" "babel" t) t))
+
+;; Dictionaries and spelling
+;; Set location for external dictionaries
+(add-to-list 'load-path "/usr/local/share/hunspell/")
+
+(setq ispell-program-name (executable-find "hunspell")
+      ispell-dictionary "it_IT")
+
+;; (bind-key "C-c I"
+;;           (lambda ()
+;;             (interactive)
+;;             (ispell-change-dictionary "it_IT")
+;;             (flyspell-buffer)))
+
+;; (bind-key "C-c E"
+;;           (lambda ()
+;;             (interactive)
+;;             (ispell-change-dictionary "en_US")
+;;             (flyspell-buffer)))
 
 ;; org-clock
 ;; Save clock data and state changes and notes in the LOGBOOK drawer
@@ -156,7 +185,7 @@
 
 ;; gnupg
 (require 'epa-file)
- '(epg-gpg-program "/usr/local/Cellar/gnupg/2.2.12/bin/gpg")
+(custom-set-variables '(epg-gpg-program "/usr/local/Cellar/gnupg/2.2.13/bin/gpg"))
 (epa-file-enable)
 
 ;; ledger
