@@ -191,7 +191,7 @@
 ;; ledger
 (autoload 'ledger-mode "ledger-mode" "A major mode for Ledger" t)
 (add-to-list 'load-path
-             (expand-file-name "C:/emacs/share/emacs/site-lisp/ledger"))
+             (expand-file-name "/usr/local/share/emacs/site-lisp/ledger"))
 (add-to-list 'auto-mode-alist '("\\.ledger$" . ledger-mode))
 
 ; loading package
